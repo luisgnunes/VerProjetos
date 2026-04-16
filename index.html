@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Projetos BR163/MS">
+<meta name="description" content="Consulta de documentos de projetos da BR163/MS">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>LISTA DE DOCUMENTOS</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg:       #ffffff;
+    --surface:  #f5f5f5;
+    --card:     #efefef;
+    --border:   #d0d0d0;
+    --accent:   #f0a500;
+    --accent2:  #00b8d9;
+    --text:     #1a1a2e;
+    --muted:    #6b7280;
+    --danger:   #e05c5c;
+
+    --disc-AC: #9333ea;
+    --disc-AE: #0ea5e9;
+    --disc-AQ: #ec4899;
+    --disc-AR: #14b8a6;
+    --disc-AU: #6366f1;
+    --disc-BF: #78909c;
+    --disc-CQ: #2dd4bf;
+    --disc-CS: #d4874b;
+    --disc-DB: #6b7280;
+    --disc-DR: #00b8d9;
+    --disc-DS: #ef4444;
+    --disc-DV: #f97316;
+    --disc-EE: #8b5cf6;
+    --disc-EL: #eab308;
+    --disc-EM: #4e8dc4;
+    --disc-ES: #3b82f6;
+    --disc-EX: #10b981;
+    --disc-GE: #f06060;
+    --disc-GG: #c17f3e;
+    --disc-GR: #94a3b8;
+    --disc-HI: #60a5fa;
+    --disc-IM: #64748b;
+    --disc-IN: #f59e0b;
+    --disc-IV: #e91e63;
+    --disc-MA: #22c55e;
+    --disc-OC: #009688;
+    --disc-OU: #9e9e9e;
+    --disc-PA: #84cc16;
+    --disc-PV: #7bc950;
+    --disc-RP: #dc2626;
+    --disc-SE: #fb923c;
+    --disc-SI: #fbbf24;
+    --disc-TE: #e07b00;
+    --disc-TO: #a855f7;
+    --disc-TR: #06b6d4;
+
+    --radius: 6px;
+    --font-main: 'Syne', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-main);
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px 10px;
+  }
+
+  .logo-mark {
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-mark img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .header-title h1 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #1a1a2e;
+    line-height: 1.1;
+  }
+
+  .header-title p {
+    font-size: 0.68rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .header-status {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: background 0.3s;
+  }
+  .status-dot.online  { background: #4ade80; box-shadow: 0 0 6px #4ade8066; }
+  .status-dot.offline { background: var(--danger); }
+
+  /* ─── FILTROS ─── */
+  .filters-wrap {
+    padding: 10px 20px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .filter-label {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: -4px;
+  }
+
+  .search-row {
+    position: relative;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+    font-size: 1rem;
+  }
+
+  #search {
+    width: 100%;
+    padding: 10px 12px 10px 38px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  #search::placeholder { color: var(--muted); }
+  #search:focus { border-color: var(--accent); }
+
+  .btn-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.18s;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .filter-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+    font-weight: 600;
+  }
+
+  .filter-btn[data-disc="AC"].active { background: var(--disc-AC); border-color: var(--disc-AC); color: #fff; }
+  .filter-btn[data-disc="AE"].active { background: var(--disc-AE); border-color: var(--disc-AE); color: #fff; }
+  .filter-btn[data-disc="AQ"].active { background: var(--disc-AQ); border-color: var(--disc-AQ); color: #fff; }
+  .filter-btn[data-disc="AR"].active { background: var(--disc-AR); border-color: var(--disc-AR); color: #fff; }
+  .filter-btn[data-disc="AU"].active { background: var(--disc-AU); border-color: var(--disc-AU); color: #fff; }
+  .filter-btn[data-disc="BF"].active { background: var(--disc-BF); border-color: var(--disc-BF); color: #fff; }
+  .filter-btn[data-disc="CQ"].active { background: var(--disc-CQ); border-color: var(--disc-CQ); color: #000; }
+  .filter-btn[data-disc="CS"].active { background: var(--disc-CS); border-color: var(--disc-CS); color: #fff; }
+  .filter-btn[data-disc="DB"].active { background: var(--disc-DB); border-color: var(--disc-DB); color: #fff; }
+  .filter-btn[data-disc="DR"].active { background: var(--disc-DR); border-color: var(--disc-DR); color: #000; }
+  .filter-btn[data-disc="DS"].active { background: var(--disc-DS); border-color: var(--disc-DS); color: #fff; }
+  .filter-btn[data-disc="DV"].active { background: var(--disc-DV); border-color: var(--disc-DV); color: #fff; }
+  .filter-btn[data-disc="EE"].active { background: var(--disc-EE); border-color: var(--disc-EE); color: #fff; }
+  .filter-btn[data-disc="EL"].active { background: var(--disc-EL); border-color: var(--disc-EL); color: #000; }
+  .filter-btn[data-disc="EM"].active { background: var(--disc-EM); border-color: var(--disc-EM); color: #fff; }
+  .filter-btn[data-disc="ES"].active { background: var(--disc-ES); border-color: var(--disc-ES); color: #fff; }
+  .filter-btn[data-disc="EX"].active { background: var(--disc-EX); border-color: var(--disc-EX); color: #fff; }
+  .filter-btn[data-disc="GE"].active { background: var(--disc-GE); border-color: var(--disc-GE); color: #fff; }
+  .filter-btn[data-disc="GG"].active { background: var(--disc-GG); border-color: var(--disc-GG); color: #fff; }
+  .filter-btn[data-disc="GR"].active { background: var(--disc-GR); border-color: var(--disc-GR); color: #000; }
+  .filter-btn[data-disc="HI"].active { background: var(--disc-HI); border-color: var(--disc-HI); color: #000; }
+  .filter-btn[data-disc="IM"].active { background: var(--disc-IM); border-color: var(--disc-IM); color: #fff; }
+  .filter-btn[data-disc="IN"].active { background: var(--disc-IN); border-color: var(--disc-IN); color: #000; }
+  .filter-btn[data-disc="IV"].active { background: var(--disc-IV); border-color: var(--disc-IV); color: #fff; }
+  .filter-btn[data-disc="MA"].active { background: var(--disc-MA); border-color: var(--disc-MA); color: #fff; }
+  .filter-btn[data-disc="OC"].active { background: var(--disc-OC); border-color: var(--disc-OC); color: #fff; }
+  .filter-btn[data-disc="OU"].active { background: var(--disc-OU); border-color: var(--disc-OU); color: #fff; }
+  .filter-btn[data-disc="PA"].active { background: var(--disc-PA); border-color: var(--disc-PA); color: #000; }
+  .filter-btn[data-disc="PV"].active { background: var(--disc-PV); border-color: var(--disc-PV); color: #000; }
+  .filter-btn[data-disc="RP"].active { background: var(--disc-RP); border-color: var(--disc-RP); color: #fff; }
+  .filter-btn[data-disc="SE"].active { background: var(--disc-SE); border-color: var(--disc-SE); color: #000; }
+  .filter-btn[data-disc="SI"].active { background: var(--disc-SI); border-color: var(--disc-SI); color: #000; }
+  .filter-btn[data-disc="TE"].active { background: var(--disc-TE); border-color: var(--disc-TE); color: #fff; }
+  .filter-btn[data-disc="TO"].active { background: var(--disc-TO); border-color: var(--disc-TO); color: #fff; }
+  .filter-btn[data-disc="TR"].active { background: var(--disc-TR); border-color: var(--disc-TR); color: #000; }
+
+  .trecho-row {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+  .trecho-row::-webkit-scrollbar { display: none; }
+
+  /* ─── RESULTADOS ─── */
+  .results-meta {
+    padding: 10px 20px 6px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #count-label { color: var(--accent); }
+
+  .clear-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .clear-btn:hover { color: var(--text); }
+
+  /* ─── TABLE ─── */
+  .table-wrap {
+    padding: 0 16px 100px;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+  }
+
+  thead th {
+    padding: 10px 12px;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+  }
+
+  thead th:last-child { text-align: center; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+  }
+
+  tbody tr:hover { background: var(--card); }
+
+  tbody td {
+    padding: 11px 12px;
+    font-size: 0.83rem;
+    vertical-align: middle;
+    line-height: 1.35;
+  }
+
+  .td-code {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .td-titulo {
+    color: var(--text);
+    max-width: 320px;
+  }
+
+  .td-titulo mark {
+    background: rgba(240, 165, 0, 0.25);
+    color: var(--accent);
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+
+  .badge-disc {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .badge-AC { background: rgba(147, 51,234,0.12); color: var(--disc-AC); }
+  .badge-AE { background: rgba( 14,165,233,0.12); color: var(--disc-AE); }
+  .badge-AQ { background: rgba(236, 72,153,0.12); color: var(--disc-AQ); }
+  .badge-AR { background: rgba( 20,184,166,0.12); color: var(--disc-AR); }
+  .badge-AU { background: rgba( 99,102,241,0.12); color: var(--disc-AU); }
+  .badge-BF { background: rgba(120,144,156,0.12); color: var(--disc-BF); }
+  .badge-CQ { background: rgba( 45,212,191,0.12); color: var(--disc-CQ); }
+  .badge-CS { background: rgba(212,135, 75,0.12); color: var(--disc-CS); }
+  .badge-DB { background: rgba(107,114,128,0.12); color: var(--disc-DB); }
+  .badge-DR { background: rgba(  0,184,217,0.12); color: var(--disc-DR); }
+  .badge-DS { background: rgba(239, 68, 68,0.12); color: var(--disc-DS); }
+  .badge-DV { background: rgba(249,115, 22,0.12); color: var(--disc-DV); }
+  .badge-EE { background: rgba(139, 92,246,0.12); color: var(--disc-EE); }
+  .badge-EL { background: rgba(234,179,  8,0.12); color: var(--disc-EL); }
+  .badge-EM { background: rgba( 78,141,196,0.12); color: var(--disc-EM); }
+  .badge-ES { background: rgba( 59,130,246,0.12); color: var(--disc-ES); }
+  .badge-EX { background: rgba( 16,185,129,0.12); color: var(--disc-EX); }
+  .badge-GE { background: rgba(240, 96, 96,0.12); color: var(--disc-GE); }
+  .badge-GG { background: rgba(193,127, 62,0.12); color: var(--disc-GG); }
+  .badge-GR { background: rgba(148,163,184,0.12); color: var(--disc-GR); }
+  .badge-HI { background: rgba( 96,165,250,0.12); color: var(--disc-HI); }
+  .badge-IM { background: rgba(100,116,139,0.12); color: var(--disc-IM); }
+  .badge-IN { background: rgba(245,158, 11,0.12); color: var(--disc-IN); }
+  .badge-IV { background: rgba(233, 30, 99,0.12); color: var(--disc-IV); }
+  .badge-MA { background: rgba( 34,197, 94,0.12); color: var(--disc-MA); }
+  .badge-OC { background: rgba(  0,150,136,0.12); color: var(--disc-OC); }
+  .badge-OU { background: rgba(158,158,158,0.12); color: var(--disc-OU); }
+  .badge-PA { background: rgba(132,204, 22,0.12); color: var(--disc-PA); }
+  .badge-PV { background: rgba(123,201, 80,0.12); color: var(--disc-PV); }
+  .badge-RP { background: rgba(220, 38, 38,0.12); color: var(--disc-RP); }
+  .badge-SE { background: rgba(251,146, 60,0.12); color: var(--disc-SE); }
+  .badge-SI { background: rgba(251,191, 36,0.12); color: var(--disc-SI); }
+  .badge-TE { background: rgba(224,123,  0,0.12); color: var(--disc-TE); }
+  .badge-TO { background: rgba(168, 85,247,0.12); color: var(--disc-TO); }
+  .badge-TR { background: rgba(  6,182,212,0.12); color: var(--disc-TR); }
+
+  .td-trecho {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .td-rev {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text);
+    text-align: center;
+  }
+
+  .td-link { text-align: center; }
+
+  .btn-abrir {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: var(--radius);
+    background: rgba(240, 165, 0, 0.1);
+    border: 1px solid rgba(240, 165, 0, 0.3);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn-abrir:hover {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+
+  /* ─── EMPTY / LOADING ─── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .empty-state .icon { font-size: 2.5rem; opacity: 0.3; }
+  .empty-state p {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  /* ─── TOAST ─── */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-family: var(--font-mono);
+    transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+    z-index: 200;
+    white-space: nowrap;
+  }
+
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ─── UPDATE BANNER ─── */
+  #update-banner {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    background: var(--accent);
+    color: #000;
+    text-align: center;
+    padding: 12px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    z-index: 300;
+    cursor: pointer;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 500px) {
+    .header-top { padding: 12px 14px 8px; }
+    .filters-wrap { padding: 8px 14px 12px; }
+    .table-wrap { padding: 0 8px 100px; }
+    .results-meta { padding: 8px 14px 4px; }
+  }
+
+  /* ─── ANIMAÇÃO ENTRADA ─── */
+  @keyframes rowIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  tbody tr { animation: rowIn 0.2s ease both; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="logo-mark"><img src="Aterpa.png" alt="Aterpa"></div>
+    <div class="header-title">
+      <h1>Consulta de Documentos</h1>
+      <p>Construtora Aterpa - A373 - BR163/MS</p>
+    </div>
+    <div class="header-status">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-label">—</span>
+    </div>
+  </div>
+
+  <div class="filters-wrap">
+    <!-- Busca -->
+    <div class="search-row">
+      <span class="search-icon">⌕</span>
+      <input type="search" id="search" placeholder="Buscar por código, título ou palavra-chave…"
+             autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+
+    <!-- Disciplinas -->
+    <span class="filter-label">Disciplinas</span>
+    <div class="btn-row" id="disc-btns">
+      <button class="filter-btn active" data-disc="TODAS">Todas</button>
+    </div>
+
+    <!-- Trechos (seleção múltipla) -->
+    <span class="filter-label">Trechos</span>
+    <div class="trecho-row" id="trecho-btns"></div>
+  </div>
+</header>
+
+<div class="results-meta">
+  <span><span id="count-label">0</span> documentos encontrados</span>
+  <button class="clear-btn" id="clear-btn">Limpar filtros</button>
+</div>
+
+<div class="table-wrap">
+  <table id="docs-table">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Título</th>
+        <th>Disciplina</th>
+        <th>Trecho</th>
+        <th>Rev.</th>
+        <th>Abrir</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div id="empty-state" class="empty-state" style="display:none">
+    <div class="icon">📂</div>
+    <p>Nenhum documento encontrado para os filtros selecionados.</p>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="update-banner" onclick="window.location.reload()">
+  🔄 Nova versão disponível — toque para atualizar
+</div>
+
+<script>
+// ─── DISCIPLINAS ──────────────────────────────────────────────────────────
+const DISCIPLINAS = [
+  { code: 'AC', nome: 'Adequação de Acessibilidade' },
+  { code: 'AE', nome: 'Levantamento Aerofotogramétrico' },
+  { code: 'AQ', nome: 'Arquitetura' },
+  { code: 'AR', nome: 'Ar Condicionado (Ventilação)' },
+  { code: 'AU', nome: 'Automação (Telecomunicações)' },
+  { code: 'BF', nome: 'Bota Fora' },
+  { code: 'CQ', nome: 'Controle de Qualidade' },
+  { code: 'CS', nome: 'Caminho de Serviço' },
+  { code: 'DB', nome: 'Data Book' },
+  { code: 'DR', nome: 'Drenagem' },
+  { code: 'DS', nome: 'Desapropriação' },
+  { code: 'DV', nome: 'Desvio de Tráfego' },
+  { code: 'EE', nome: 'Estudos Especiais' },
+  { code: 'EL', nome: 'Iluminação e Instalações Elétricas' },
+  { code: 'EM', nome: 'Estrutura Metálica' },
+  { code: 'ES', nome: 'Estrutura' },
+  { code: 'EX', nome: 'Sequência Executiva' },
+  { code: 'GE', nome: 'Geométrico' },
+  { code: 'GG', nome: 'Geotecnia e Geologia' },
+  { code: 'GR', nome: 'Genérico / Geral' },
+  { code: 'HI', nome: 'Instalação Hidráulica' },
+  { code: 'IM', nome: 'Impermeabilização' },
+  { code: 'IN', nome: 'Interferências (Faixa de Domínio)' },
+  { code: 'IV', nome: 'Identidade Visual' },
+  { code: 'MA', nome: 'Meio Ambiente' },
+  { code: 'OC', nome: 'Obras Complementares' },
+  { code: 'OU', nome: 'Outros' },
+  { code: 'PA', nome: 'Paisagismo' },
+  { code: 'PV', nome: 'Pavimentação' },
+  { code: 'RP', nome: 'Reintegração de Posse' },
+  { code: 'SE', nome: 'Dispositivos de Segurança' },
+  { code: 'SI', nome: 'Sinalização' },
+  { code: 'TE', nome: 'Terraplenagem' },
+  { code: 'TO', nome: 'Topografia' },
+  { code: 'TR', nome: 'Estudo de Tráfego' },
+];
+const DISC_MAP = Object.fromEntries(DISCIPLINAS.map(d => [d.code, d.nome]));
+
+function buildDiscButtons() {
+  const presentDiscs = new Set(allDocs.map(d => d.disciplina));
+  const wrap = document.getElementById('disc-btns');
+  // remove botões gerados anteriormente, mantém apenas "TODAS"
+  [...wrap.querySelectorAll('[data-disc]:not([data-disc="TODAS"])')].forEach(b => b.remove());
+  DISCIPLINAS
+    .filter(d => presentDiscs.has(d.code))
+    .forEach(d => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn';
+      btn.dataset.disc = d.code;
+      btn.title = d.nome;
+      btn.textContent = `${d.code} — ${d.nome}`;
+      wrap.appendChild(btn);
+    });
+}
+
+// ─── ESTADO ───────────────────────────────────────────────────────────────
+let allDocs = [];
+let filteredDocs = [];
+let activeDisc    = 'TODAS';
+let activeTrechos = new Set(); // vazio = todos os trechos
+
+// ─── CARREGAMENTO DE DADOS ────────────────────────────────────────────────
+async function loadDocumentos() {
+  try {
+    const resp = await fetch('./documentos.json?v=' + Date.now());
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    allDocs = await resp.json();
+    buildDiscButtons();
+    buildTrechoButtons();
+    applyFilters();
+    showToast(`${allDocs.length} documentos carregados`);
+  } catch (err) {
+    // Tenta cache do service worker
+    try {
+      const cached = await fetch('./documentos.json');
+      allDocs = await cached.json();
+      buildDiscButtons();
+      buildTrechoButtons();
+      applyFilters();
+      showToast('⚡ Dados offline');
+    } catch {
+      showToast('❌ Erro ao carregar documentos');
+    }
+  }
+}
+
+// ─── BOTÕES DE TRECHO (seleção múltipla) ─────────────────────────────────
+function buildTrechoButtons() {
+  const trechos = [...new Set(allDocs.map(d => d.trecho))].sort();
+  const wrap = document.getElementById('trecho-btns');
+  wrap.innerHTML = '';
+
+  trechos.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.dataset.trecho = t;
+    btn.textContent = t;
+    btn.addEventListener('click', () => {
+      if (activeTrechos.has(t)) {
+        activeTrechos.delete(t);
+        btn.classList.remove('active');
+      } else {
+        activeTrechos.add(t);
+        btn.classList.add('active');
+      }
+      applyFilters();
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+// ─── FILTROS ──────────────────────────────────────────────────────────────
+function normalize(str) {
+  return (str || '').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function applyFilters() {
+  const query = normalize(document.getElementById('search').value.trim());
+  const terms  = query.split(/\s+/).filter(Boolean);
+
+  filteredDocs = allDocs.filter(doc => {
+    if (activeDisc !== 'TODAS' && doc.disciplina !== activeDisc) return false;
+    if (activeTrechos.size > 0 && !activeTrechos.has(doc.trecho)) return false;
+
+    if (terms.length === 0) return true;
+
+    const haystack = normalize(
+      [doc.codigo, doc.titulo, doc.palavras_chave, doc.disciplina, doc.trecho].join(' ')
+    );
+    return terms.every(t => haystack.includes(t));
+  });
+
+  renderTable(terms);
+  document.getElementById('count-label').textContent = filteredDocs.length;
+}
+
+// ─── RENDER TABLE ─────────────────────────────────────────────────────────
+function highlight(text, terms) {
+  if (!terms.length) return escHtml(text);
+  let result = escHtml(text);
+  terms.forEach(term => {
+    const re = new RegExp(escRegex(term), 'gi');
+    result = result.replace(re, m => `<mark>${m}</mark>`);
+  });
+  return result;
+}
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function escRegex(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function renderTable(terms = []) {
+  const tbody = document.getElementById('tbody');
+  const empty = document.getElementById('empty-state');
+
+  if (filteredDocs.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+
+  empty.style.display = 'none';
+
+  tbody.innerHTML = filteredDocs.map((doc, i) => `
+    <tr style="animation-delay:${Math.min(i * 0.03, 0.3)}s">
+      <td class="td-code">${highlight(doc.codigo, terms)}</td>
+      <td class="td-titulo">${highlight(doc.titulo, terms)}</td>
+      <td><span class="badge-disc badge-${escHtml(doc.disciplina)}" title="${escHtml(DISC_MAP[doc.disciplina] || doc.disciplina)}">
+        ${escHtml(doc.disciplina)}</span></td>
+      <td class="td-trecho">${escHtml(doc.trecho)}</td>
+      <td class="td-rev">${escHtml(doc.revisao)}</td>
+      <td class="td-link">
+        ${doc.link && doc.link !== 'https://onedrive.live.com/...'
+          ? `<a class="btn-abrir" href="${escHtml(doc.link)}" target="_blank" rel="noopener">
+               ↗ Abrir
+             </a>`
+          : `<span style="color:var(--muted);font-size:0.65rem;font-family:var(--font-mono)">— sem link —</span>`
+        }
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ─── EVENTOS ──────────────────────────────────────────────────────────────
+document.getElementById('search').addEventListener('input', () => applyFilters());
+
+document.getElementById('disc-btns').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  activeDisc = btn.dataset.disc;
+  document.querySelectorAll('#disc-btns .filter-btn')
+    .forEach(b => b.classList.toggle('active', b.dataset.disc === activeDisc));
+  applyFilters();
+});
+
+document.getElementById('clear-btn').addEventListener('click', () => {
+  document.getElementById('search').value = '';
+  activeDisc    = 'TODAS';
+  activeTrechos = new Set();
+  document.querySelectorAll('#disc-btns .filter-btn')
+    .forEach(b => b.classList.toggle('active', b.dataset.disc === 'TODAS'));
+  document.querySelectorAll('#trecho-btns .filter-btn')
+    .forEach(b => b.classList.remove('active'));
+  applyFilters();
+});
+
+// ─── STATUS ONLINE/OFFLINE ────────────────────────────────────────────────
+function updateStatus() {
+  const dot   = document.getElementById('status-dot');
+  const label = document.getElementById('status-label');
+  if (navigator.onLine) {
+    dot.className = 'status-dot online';
+    label.textContent = 'Online';
+  } else {
+    dot.className = 'status-dot offline';
+    label.textContent = 'Offline';
+  }
+}
+
+window.addEventListener('online',  updateStatus);
+window.addEventListener('offline', updateStatus);
+updateStatus();
+
+// ─── TOAST ────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ─── SERVICE WORKER ───────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').then(reg => {
+    reg.addEventListener('updatefound', () => {
+      const nw = reg.installing;
+      nw.addEventListener('statechange', () => {
+        if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+          document.getElementById('update-banner').style.display = 'block';
+        }
+      });
+    });
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+loadDocumentos();
+</script>
+</body>
+</html>
