@@ -147,8 +147,6 @@
   }
   .status-dot.online  { background: #4ade80; box-shadow: 0 0 6px #4ade8066; }
   .status-dot.offline { background: var(--danger); }
-  .status-dot.local   { background: #f59e0b; box-shadow: 0 0 6px #f59e0b66; }
-  .status-dot.cloud   { background: #00b8d9; box-shadow: 0 0 6px #00b8d966; }
 
   /* ─── FILTROS ─── */
   .filters-wrap {
@@ -645,82 +643,29 @@ let filteredDocs = [];
 let activeDisc    = 'TODAS';
 let activeTrechos = new Set(); // vazio = todos os trechos
 
-// ─── SERVIDOR LOCAL ────────────────────────────────────────────────────────
-// Porta padrão do Simple HTTP Server (Play Store). Ajuste se necessário.
-const LOCAL_PORT   = 8080;
-const LOCAL_ORIGIN = `http://localhost:${LOCAL_PORT}`;
-let   servidorLocal = false; // true = servidor local disponível
-
-async function probeServidorLocal() {
-  try {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 2000); // timeout 2 s
-    const resp  = await fetch(`${LOCAL_ORIGIN}/documentos.json`, {
-      signal: ctrl.signal, cache: 'no-store'
-    });
-    clearTimeout(timer);
-    servidorLocal = resp.ok;
-  } catch {
-    servidorLocal = false;
-  }
-}
-
-function resolveLink(doc) {
-  if (servidorLocal && doc.arquivo) {
-    return `${LOCAL_ORIGIN}/${doc.arquivo}`;
-  }
-  return doc.link || null;
-}
-
-function updateStatusIndicator() {
-  const dot   = document.getElementById('status-dot');
-  const label = document.getElementById('status-label');
-  if (servidorLocal) {
-    dot.className   = 'status-dot local';
-    label.textContent = '📁 Local';
-  } else if (navigator.onLine) {
-    dot.className   = 'status-dot cloud';
-    label.textContent = '☁ Nuvem';
-  } else {
-    dot.className   = 'status-dot offline';
-    label.textContent = 'Offline';
-  }
-}
-
 // ─── CARREGAMENTO DE DADOS ────────────────────────────────────────────────
 async function loadDocumentos() {
-  // 1. Detecta servidor local antes de qualquer coisa
-  await probeServidorLocal();
-  updateStatusIndicator();
-
-  // 2. Tenta carregar documentos.json do servidor local (mais atual)
-  //    ou do próprio diretório do app (deploy SharePoint/web)
-  const urls = servidorLocal
-    ? [`${LOCAL_ORIGIN}/documentos.json`, './documentos.json']
-    : [`./documentos.json?v=${Date.now()}`, './documentos.json'];
-
-  let loaded = false;
-  for (const url of urls) {
+  try {
+    const resp = await fetch('./documentos.json?v=' + Date.now());
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    allDocs = await resp.json();
+    buildDiscButtons();
+    buildTrechoButtons();
+    applyFilters();
+    showToast(`${allDocs.length} documentos carregados`);
+  } catch (err) {
+    // Tenta cache do service worker
     try {
-      const resp = await fetch(url, { cache: 'no-store' });
-      if (!resp.ok) continue;
-      allDocs = await resp.json();
-      loaded  = true;
-      break;
-    } catch { /* tenta próxima */ }
+      const cached = await fetch('./documentos.json');
+      allDocs = await cached.json();
+      buildDiscButtons();
+      buildTrechoButtons();
+      applyFilters();
+      showToast('⚡ Dados offline');
+    } catch {
+      showToast('❌ Erro ao carregar documentos');
+    }
   }
-
-  if (!loaded) {
-    showToast('❌ Erro ao carregar documentos');
-    return;
-  }
-
-  buildDiscButtons();
-  buildTrechoButtons();
-  applyFilters();
-
-  const origem = servidorLocal ? '📁 Servidor local' : '☁ Nuvem';
-  showToast(`${allDocs.length} documentos — ${origem}`);
 }
 
 // ─── BOTÕES DE TRECHO (seleção múltipla) ─────────────────────────────────
@@ -807,9 +752,7 @@ function renderTable(terms = []) {
 
   empty.style.display = 'none';
 
-  tbody.innerHTML = filteredDocs.map((doc, i) => {
-    const href = resolveLink(doc);
-    return `
+  tbody.innerHTML = filteredDocs.map((doc, i) => `
     <tr style="animation-delay:${Math.min(i * 0.03, 0.3)}s">
       <td class="td-code">${highlight(doc.codigo, terms)}</td>
       <td class="td-titulo">${highlight(doc.titulo, terms)}</td>
@@ -818,15 +761,15 @@ function renderTable(terms = []) {
       <td class="td-trecho">${escHtml(doc.trecho)}</td>
       <td class="td-rev">${escHtml(doc.revisao)}</td>
       <td class="td-link">
-        ${href && href !== 'https://onedrive.live.com/...'
-          ? `<a class="btn-abrir" href="${escHtml(href)}" target="_blank" rel="noopener">
+        ${doc.link && doc.link !== 'https://onedrive.live.com/...'
+          ? `<a class="btn-abrir" href="${escHtml(doc.link)}" target="_blank" rel="noopener">
                ↗ Abrir
              </a>`
           : `<span style="color:var(--muted);font-size:0.65rem;font-family:var(--font-mono)">— sem link —</span>`
         }
       </td>
-    </tr>`;
-  }).join('');
+    </tr>
+  `).join('');
 }
 
 // ─── EVENTOS ──────────────────────────────────────────────────────────────
@@ -853,8 +796,21 @@ document.getElementById('clear-btn').addEventListener('click', () => {
 });
 
 // ─── STATUS ONLINE/OFFLINE ────────────────────────────────────────────────
-window.addEventListener('online',  updateStatusIndicator);
-window.addEventListener('offline', updateStatusIndicator);
+function updateStatus() {
+  const dot   = document.getElementById('status-dot');
+  const label = document.getElementById('status-label');
+  if (navigator.onLine) {
+    dot.className = 'status-dot online';
+    label.textContent = 'Online';
+  } else {
+    dot.className = 'status-dot offline';
+    label.textContent = 'Offline';
+  }
+}
+
+window.addEventListener('online',  updateStatus);
+window.addEventListener('offline', updateStatus);
+updateStatus();
 
 // ─── TOAST ────────────────────────────────────────────────────────────────
 let toastTimer;

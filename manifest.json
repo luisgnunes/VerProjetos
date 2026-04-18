@@ -1,7 +1,7 @@
 {
-  "name": "Projetos de Infraestrutura",
+  "name": "Lista de Projetos - BR163MS",
   "short_name": "Projetos",
-  "description": "Consulta rápida de documentos de projetos de infraestrutura rodoviária",
+  "description": "Consulta rápida de documentos de projetos da BR163MS",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f1923",
