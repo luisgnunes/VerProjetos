@@ -494,23 +494,44 @@ let localOnline = false;
 
 function localBase() { return `http://localhost:${localPort}`; }
 
-// Probe com mode:'no-cors' — funciona mesmo sem headers CORS no servidor
+// Probe: tenta buscar documentos.json do servidor local.
+// Estratégia dupla:
+//   1. fetch normal (com CORS) — se o servidor enviar Access-Control-Allow-Origin, funciona.
+//   2. fetch no-cors com XMLHttpRequest de fallback — para servidores sem header CORS.
 // rerender=true apenas quando chamado pelo visibilitychange (tabela já populada)
 async function checkLocalServer(rerender = false) {
   setBadge('checking', '…');
-  try {
-    const ctrl  = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 2000);
-    await fetch(localBase() + '/', { signal: ctrl.signal, mode: 'no-cors', cache: 'no-store' });
-    clearTimeout(timer);
-    localOnline = true;
+  localOnline = await probeLocal();
+  if (localOnline) {
     setBadge('local', `LOCAL :${localPort}`);
     if (rerender) showToast(`✓ Servidor local ativo — porta ${localPort}`);
-  } catch {
-    localOnline = false;
+  } else {
     setBadge('cloud', 'NUVEM');
   }
   if (rerender) renderTable(lastTerms);
+}
+
+async function probeLocal() {
+  const url = localBase() + '/documentos.json';
+  // Tentativa 1: fetch normal (funciona se servidor tiver CORS ou se for mesma origem)
+  try {
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 2000);
+    const resp  = await fetch(url, { signal: ctrl.signal, cache: 'no-store' });
+    clearTimeout(timer);
+    if (resp.ok) return true;
+  } catch { /* CORS bloqueado ou timeout — tenta XMLHttpRequest */ }
+
+  // Tentativa 2: XMLHttpRequest — em alguns browsers Android ignora CORS para localhost
+  return new Promise(resolve => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('HEAD', url, true);
+    xhr.timeout = 2000;
+    xhr.onload  = () => resolve(xhr.status >= 200 && xhr.status < 400);
+    xhr.onerror = () => resolve(false);
+    xhr.ontimeout = () => resolve(false);
+    xhr.send();
+  });
 }
 
 function setBadge(cls, txt) {
