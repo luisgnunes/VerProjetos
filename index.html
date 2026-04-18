@@ -495,7 +495,8 @@ let localOnline = false;
 function localBase() { return `http://localhost:${localPort}`; }
 
 // Probe com mode:'no-cors' — funciona mesmo sem headers CORS no servidor
-async function checkLocalServer() {
+// rerender=true apenas quando chamado pelo visibilitychange (tabela já populada)
+async function checkLocalServer(rerender = false) {
   setBadge('checking', '…');
   try {
     const ctrl  = new AbortController();
@@ -504,13 +505,12 @@ async function checkLocalServer() {
     clearTimeout(timer);
     localOnline = true;
     setBadge('local', `LOCAL :${localPort}`);
-    showToast(`✓ Servidor local ativo — porta ${localPort}`);
+    if (rerender) showToast(`✓ Servidor local ativo — porta ${localPort}`);
   } catch {
     localOnline = false;
     setBadge('cloud', 'NUVEM');
   }
-  // Re-renderiza os botões da tabela com o modo correto
-  renderTable(lastTerms);
+  if (rerender) renderTable(lastTerms);
 }
 
 function setBadge(cls, txt) {
@@ -743,7 +743,7 @@ updateNetworkStatus();
 
 // Revalida servidor local ao retornar para a aba (usuário pode ter iniciado o servidor)
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) checkLocalServer();
+  if (!document.hidden) checkLocalServer(true);
 });
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -775,10 +775,14 @@ if ('serviceWorker' in navigator) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// INIT — carrega dados e detecta servidor em paralelo
+// INIT — detecta servidor PRIMEIRO, depois carrega e renderiza dados
 // ══════════════════════════════════════════════════════════════════════════
-loadDocumentos();
-checkLocalServer();
+// Ordem importa: checkLocalServer define localOnline antes de loadDocumentos
+// renderizar os links. Rodar em paralelo causaria a tabela usar sempre nuvem.
+(async () => {
+  await checkLocalServer();
+  await loadDocumentos();
+})();
 </script>
 </body>
 </html>
