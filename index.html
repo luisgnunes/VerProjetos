@@ -321,6 +321,21 @@
   }
   #toast.show { transform: translateX(-50%) translateY(0); }
 
+  /* toast com ação inline */
+  #toast .toast-action {
+    display: inline-block;
+    margin-left: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid currentColor;
+    font-size: 0.7rem;
+    cursor: pointer;
+    opacity: 0.85;
+    vertical-align: middle;
+    transition: opacity 0.15s;
+  }
+  #toast .toast-action:hover { opacity: 1; }
+
   /* ─── UPDATE BANNER ─── */
   #update-banner {
     display: none; position: fixed; bottom: 0; left: 0; right: 0;
@@ -490,44 +505,74 @@ let activeTrechos = new Set(); // seleção múltipla
 // Porta persistida entre sessões via localStorage
 // ══════════════════════════════════════════════════════════════════════════
 let localPort   = parseInt(localStorage.getItem('localPort') || '8080');
+
+// localOnline: false = nuvem automático | true = local detectado | 'manual' = forçado pelo usuário
 let localOnline = false;
 
 function localBase() { return `http://localhost:${localPort}`; }
+function isLocal()   { return localOnline === true || localOnline === 'manual'; }
 
 // ── PROBE DO SERVIDOR LOCAL ──────────────────────────────────────────────
-// fetch e XHR são bloqueados por CORS/mixed-content quando a página vem de HTTPS
-// ou file://. A única forma confiável de testar localhost sem CORS é carregar
-// um recurso via tag <img> ou <script> — o browser não aplica CORS a esses.
-// Usamos um <img> apontando para favicon.ico (ou qualquer arquivo) do servidor:
-// se carregar → ativo; se der erro → inativo.
-// rerender=true quando chamado pelo visibilitychange (tabela já populada)
+// Usa <img> para contornar CORS/mixed-content: se o servidor responder qualquer
+// coisa → onload (ativo); se recusar conexão TCP → onerror (inativo).
+// rerender=true quando chamado com tabela já populada (visibilitychange, offline→online)
 async function checkLocalServer(rerender = false) {
+  if (localOnline === 'manual') return; // modo manual: não sobrescreve escolha do usuário
   setBadge('checking', '…');
-  localOnline = await probeLocal();
-  if (localOnline) {
+  const detected = await probeLocal();
+  localOnline = detected;
+  applyBadge(rerender);
+}
+
+function applyBadge(rerender = false) {
+  if (isLocal()) {
     setBadge('local', `LOCAL :${localPort}`);
-    if (rerender) {
-      showToast(`✓ Servidor local ativo — porta ${localPort}`);
-      renderTable(lastTerms);
-    }
   } else {
     setBadge('cloud', 'NUVEM');
-    if (rerender) renderTable(lastTerms);
+    // Exibe toast com opção de forçar modo local
+    showToastCloud();
+    return;
   }
+  if (rerender) {
+    renderTable(lastTerms);
+    if (localOnline === true) showToast(`✓ Servidor local ativo — porta ${localPort}`);
+    if (localOnline === 'manual') showToast(`📁 Modo local ativado manualmente — porta ${localPort}`);
+  }
+}
+
+// Toast especial para modo nuvem: oferece botão para forçar local
+function showToastCloud() {
+  const el = document.getElementById('toast');
+  el.innerHTML =
+    '☁ Usando nuvem' +
+    '<span class="toast-action" id="toast-force-local">Usar local</span>';
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 5000);
+  document.getElementById('toast-force-local').addEventListener('click', forceLocalMode);
+}
+
+// Usuário força modo local manualmente
+function forceLocalMode() {
+  localOnline = 'manual';
+  localStorage.setItem('localMode', 'manual');
+  setBadge('local', `LOCAL :${localPort} ★`);
+  renderTable(lastTerms);
+  showToast(`📁 Modo local ativado — porta ${localPort}`);
+}
+
+// Cancela modo manual (volta para auto-detecção)
+function resetToAuto() {
+  localOnline = false;
+  localStorage.removeItem('localMode');
+  checkLocalServer(true);
 }
 
 function probeLocal() {
   return new Promise(resolve => {
     const img = new Image();
-    // Adiciona timestamp para evitar cache
     img.src = localBase() + '/documentos.json?' + Date.now();
-    const timer = setTimeout(() => {
-      img.src = '';   // cancela
-      resolve(false);
-    }, 2500);
-    // onload dispara se o servidor responder qualquer coisa (mesmo JSON — browser
-    // tenta renderizar como imagem, falha, mas isso NÃO dispara onerror no Android)
-    // onerror dispara quando a conexão TCP falha (servidor offline)
+    const timer = setTimeout(() => { img.src = ''; resolve(false); }, 2500);
     img.onload  = () => { clearTimeout(timer); resolve(true); };
     img.onerror = () => { clearTimeout(timer); resolve(false); };
   });
@@ -548,11 +593,19 @@ function saveAndCheck() {
     localPort = v;
     localStorage.setItem('localPort', String(v));
   }
-  checkLocalServer();
+  // Ao mudar porta, reseta modo manual e refaz detecção
+  localOnline = false;
+  localStorage.removeItem('localMode');
+  checkLocalServer(true);
 }
 
 document.getElementById('mode-badge').addEventListener('click', togglePanel);
 document.getElementById('cfg-port').value = localPort;
+
+// Duplo clique no badge local cancela modo manual e volta para auto
+document.getElementById('mode-badge').addEventListener('dblclick', e => {
+  if (localOnline === 'manual') { e.stopPropagation(); resetToAuto(); }
+});
 
 // ══════════════════════════════════════════════════════════════════════════
 // RESOLUÇÃO DE LINK — local com subcaminho + encoding seguro / fallback nuvem
@@ -568,7 +621,7 @@ document.getElementById('cfg-port').value = localPort;
   encodeURIComponent segmento a segmento.
 */
 function resolveLink(doc) {
-  if (localOnline) {
+  if (isLocal()) {
     const localPath = doc.arquivo_local || doc.arquivo;
     if (localPath) {
       const encoded = localPath
@@ -769,8 +822,29 @@ function updateNetworkStatus() {
   dot.className     = 'status-dot ' + (navigator.onLine ? 'online' : 'offline');
   label.textContent = navigator.onLine ? 'Online' : 'Offline';
 }
-window.addEventListener('online',  updateNetworkStatus);
-window.addEventListener('offline', updateNetworkStatus);
+
+window.addEventListener('offline', () => {
+  updateNetworkStatus();
+  // Ao ficar offline, força modo local automaticamente (sem probe — sem rede)
+  if (!isLocal()) {
+    localOnline = 'manual';
+    localStorage.setItem('localMode', 'manual');
+    setBadge('local', `LOCAL :${localPort} ★`);
+    renderTable(lastTerms);
+    showToast('📶 Offline — modo local ativado automaticamente');
+  }
+});
+
+window.addEventListener('online', () => {
+  updateNetworkStatus();
+  // Ao voltar online, cancela modo manual automático e re-detecta servidor
+  if (localOnline === 'manual') {
+    localOnline = false;
+    localStorage.removeItem('localMode');
+    checkLocalServer(true);
+  }
+});
+
 updateNetworkStatus();
 
 // Revalida servidor local ao retornar para a aba (usuário pode ter iniciado o servidor)
@@ -809,10 +883,14 @@ if ('serviceWorker' in navigator) {
 // ══════════════════════════════════════════════════════════════════════════
 // INIT — detecta servidor PRIMEIRO, depois carrega e renderiza dados
 // ══════════════════════════════════════════════════════════════════════════
-// Ordem importa: checkLocalServer define localOnline antes de loadDocumentos
-// renderizar os links. Rodar em paralelo causaria a tabela usar sempre nuvem.
 (async () => {
-  await checkLocalServer();
+  // Restaura modo manual persistido (usuário escolheu local na sessão anterior)
+  if (localStorage.getItem('localMode') === 'manual') {
+    localOnline = 'manual';
+    setBadge('local', `LOCAL :${localPort} ★`);
+  } else {
+    await checkLocalServer(); // probe automático
+  }
   await loadDocumentos();
 })();
 </script>
