@@ -48,8 +48,8 @@ COL_MAP = {
     "trecho":        "TRECHO",
     "revisao":       "REVISÃO",
     "palavras_chave":"PALAVRAS-CHAVE",
-    "link":          "PASTA",
-    "arquivo":        "ARQUIVO"
+    "link":          "LINK",
+    "arquivo":        "LOCAL"
 }
 
 DISCIPLINAS_VALIDAS = {

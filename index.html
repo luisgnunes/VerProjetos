@@ -26,42 +26,21 @@
     --text:     #1a1a2e;
     --muted:    #6b7280;
     --danger:   #e05c5c;
+    --local-clr: #16a34a;
+    --cloud-clr: #0284c7;
 
-    --disc-AC: #9333ea;
-    --disc-AE: #0ea5e9;
-    --disc-AQ: #ec4899;
-    --disc-AR: #14b8a6;
-    --disc-AU: #6366f1;
-    --disc-BF: #78909c;
-    --disc-CQ: #2dd4bf;
-    --disc-CS: #d4874b;
-    --disc-DB: #6b7280;
-    --disc-DR: #00b8d9;
-    --disc-DS: #ef4444;
-    --disc-DV: #f97316;
-    --disc-EE: #8b5cf6;
-    --disc-EL: #eab308;
-    --disc-EM: #4e8dc4;
-    --disc-ES: #3b82f6;
-    --disc-EX: #10b981;
-    --disc-GE: #f06060;
-    --disc-GG: #c17f3e;
-    --disc-GR: #94a3b8;
-    --disc-HI: #60a5fa;
-    --disc-IM: #64748b;
-    --disc-IN: #f59e0b;
-    --disc-IV: #e91e63;
-    --disc-MA: #22c55e;
-    --disc-OC: #009688;
-    --disc-OU: #9e9e9e;
-    --disc-PA: #84cc16;
-    --disc-PV: #7bc950;
-    --disc-RP: #dc2626;
-    --disc-SE: #fb923c;
-    --disc-SI: #fbbf24;
-    --disc-TE: #e07b00;
-    --disc-TO: #a855f7;
-    --disc-TR: #06b6d4;
+    --disc-AC: #9333ea; --disc-AE: #0ea5e9; --disc-AQ: #ec4899;
+    --disc-AR: #14b8a6; --disc-AU: #6366f1; --disc-BF: #78909c;
+    --disc-CQ: #2dd4bf; --disc-CS: #d4874b; --disc-DB: #6b7280;
+    --disc-DR: #00b8d9; --disc-DS: #ef4444; --disc-DV: #f97316;
+    --disc-EE: #8b5cf6; --disc-EL: #eab308; --disc-EM: #4e8dc4;
+    --disc-ES: #3b82f6; --disc-EX: #10b981; --disc-GE: #f06060;
+    --disc-GG: #c17f3e; --disc-GR: #94a3b8; --disc-HI: #60a5fa;
+    --disc-IM: #64748b; --disc-IN: #f59e0b; --disc-IV: #e91e63;
+    --disc-MA: #22c55e; --disc-OC: #009688; --disc-OU: #9e9e9e;
+    --disc-PA: #84cc16; --disc-PV: #7bc950; --disc-RP: #dc2626;
+    --disc-SE: #fb923c; --disc-SI: #fbbf24; --disc-TE: #e07b00;
+    --disc-TO: #a855f7; --disc-TR: #06b6d4;
 
     --radius: 6px;
     --font-main: 'Syne', sans-serif;
@@ -69,163 +48,121 @@
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-main);
-    min-height: 100dvh;
-    overflow-x: hidden;
-  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-main); min-height: 100dvh; overflow-x: hidden; }
 
   /* ─── HEADER ─── */
   header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(255, 255, 255, 0.97);
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.97);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
   }
 
-  .header-top {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 20px 10px;
-  }
+  .header-top { display: flex; align-items: center; gap: 14px; padding: 14px 20px 10px; }
 
-  .logo-mark {
-    height: 40px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+  .logo-mark { height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .logo-mark img { height: 40px; width: auto; object-fit: contain; }
 
-  .logo-mark img {
-    height: 40px;
-    width: auto;
-    object-fit: contain;
-  }
+  .header-title h1 { font-size: 1.05rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: #1a1a2e; line-height: 1.1; }
+  .header-title p  { font-size: 0.68rem; color: var(--muted); font-family: var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; }
 
-  .header-title h1 {
-    font-size: 1.05rem;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: #1a1a2e;
-    line-height: 1.1;
-  }
+  /* ─── ÁREA DIREITA DO HEADER ─── */
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 
-  .header-title p {
-    font-size: 0.68rem;
-    color: var(--muted);
-    font-family: var(--font-mono);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+  /* Badge de modo (local / nuvem / verificando) — clicável para abrir config */
+  .mode-badge {
+    display: flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 12px;
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    border: 1px solid var(--border); background: var(--card); color: var(--muted);
+    transition: all 0.3s; cursor: pointer; user-select: none;
+    white-space: nowrap;
   }
+  .mode-badge:hover { border-color: var(--accent); color: var(--accent); }
+  .mode-badge.local   { border-color: rgba(22,163,74,0.35);  color: var(--local-clr); background: rgba(22,163,74,0.07); }
+  .mode-badge.cloud   { border-color: rgba(2,132,199,0.35);  color: var(--cloud-clr); background: rgba(2,132,199,0.07); }
+  .mode-badge.checking{ border-color: rgba(245,158,11,0.35); color: #d97706;           background: rgba(245,158,11,0.07); }
+  .mode-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  .mode-badge.local   .mode-dot { box-shadow: 0 0 5px var(--local-clr); }
+  .mode-badge.cloud   .mode-dot { box-shadow: 0 0 5px var(--cloud-clr); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .mode-badge.checking .mode-dot { animation: pulse 1s infinite; }
 
-  .header-status {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--muted);
-  }
-
-  .status-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--muted);
-    transition: background 0.3s;
-  }
+  /* Status online/offline */
+  .header-status { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); transition: background 0.3s; }
   .status-dot.online  { background: #4ade80; box-shadow: 0 0 6px #4ade8066; }
-  .status-dot.offline { background: var(--danger); }
-  .status-dot.local   { background: #f59e0b; box-shadow: 0 0 6px #f59e0b66; }
-  .status-dot.cloud   { background: #00b8d9; box-shadow: 0 0 6px #00b8d966; }
+  .status-dot.offline { background: var(--danger); box-shadow: 0 0 6px #e05c5c66; }
+
+  /* ─── PAINEL DE CONFIGURAÇÃO DO SERVIDOR ─── */
+  #cfg-panel {
+    display: none; flex-direction: column; gap: 9px;
+    padding: 10px 20px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+  #cfg-panel.open { display: flex; }
+
+  .cfg-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .cfg-row   { display: flex; gap: 8px; align-items: center; }
+
+  #cfg-port {
+    flex: 1; padding: 7px 10px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); color: var(--text);
+    font-family: var(--font-mono); font-size: 0.8rem; outline: none;
+  }
+  #cfg-port:focus { border-color: var(--accent); }
+
+  .cfg-btn {
+    padding: 7px 14px; border-radius: var(--radius);
+    border: 1px solid var(--border); background: var(--card);
+    color: var(--text); font-family: var(--font-mono); font-size: 0.72rem;
+    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .cfg-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .cfg-btn.primary { background: rgba(30,58,138,0.08); border-color: rgba(30,58,138,0.35); color: var(--accent); }
+  .cfg-btn.primary:hover { background: var(--accent); color: #fff; }
+
+  .cfg-hint { font-size: 0.67rem; color: var(--muted); font-family: var(--font-mono); line-height: 1.7; }
+  .cfg-hint strong { color: var(--text); }
 
   /* ─── FILTROS ─── */
-  .filters-wrap {
-    padding: 10px 20px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
+  .filters-wrap { padding: 10px 20px 14px; display: flex; flex-direction: column; gap: 8px; }
 
   .filter-label {
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: -4px;
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: -4px;
   }
 
-  .search-row {
-    position: relative;
-  }
-
-  .search-icon {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--muted);
-    pointer-events: none;
-    font-size: 1rem;
-  }
+  .search-row { position: relative; }
+  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: 1rem; }
 
   #search {
-    width: 100%;
-    padding: 10px 12px 10px 38px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-family: var(--font-main);
-    font-size: 0.9rem;
-    outline: none;
-    transition: border-color 0.2s;
+    width: 100%; padding: 10px 12px 10px 38px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); color: var(--text);
+    font-family: var(--font-main); font-size: 0.9rem;
+    outline: none; transition: border-color 0.2s;
   }
-
   #search::placeholder { color: var(--muted); }
   #search:focus { border-color: var(--accent); }
 
-  .btn-row {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
+  .btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
 
   .filter-btn {
-    padding: 6px 12px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: var(--card);
-    color: var(--muted);
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: all 0.18s;
-    text-transform: uppercase;
-    white-space: nowrap;
+    padding: 6px 12px; border-radius: 20px;
+    border: 1px solid var(--border); background: var(--card);
+    color: var(--muted); font-family: var(--font-mono);
+    font-size: 0.72rem; letter-spacing: 0.05em;
+    cursor: pointer; transition: all 0.18s;
+    text-transform: uppercase; white-space: nowrap;
   }
-
   .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-  .filter-btn.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-    font-weight: 600;
-  }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
 
   .filter-btn[data-disc="AC"].active { background: var(--disc-AC); border-color: var(--disc-AC); color: #fff; }
   .filter-btn[data-disc="AE"].active { background: var(--disc-AE); border-color: var(--disc-AE); color: #fff; }
@@ -263,115 +200,47 @@
   .filter-btn[data-disc="TO"].active { background: var(--disc-TO); border-color: var(--disc-TO); color: #fff; }
   .filter-btn[data-disc="TR"].active { background: var(--disc-TR); border-color: var(--disc-TR); color: #000; }
 
-  .trecho-row {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    padding-bottom: 2px;
-    scrollbar-width: none;
-  }
+  .trecho-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
   .trecho-row::-webkit-scrollbar { display: none; }
 
   /* ─── RESULTADOS ─── */
   .results-meta {
     padding: 10px 20px 6px;
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    color: var(--muted);
-    letter-spacing: 0.04em;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    font-family: var(--font-mono); font-size: 0.68rem;
+    color: var(--muted); letter-spacing: 0.04em;
+    display: flex; justify-content: space-between; align-items: center;
   }
-
   #count-label { color: var(--accent); }
-
-  .clear-btn {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    cursor: pointer;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
+  .clear-btn { background: none; border: none; color: var(--muted); font-family: var(--font-mono); font-size: 0.68rem; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
   .clear-btn:hover { color: var(--text); }
 
   /* ─── TABLE ─── */
-  .table-wrap {
-    padding: 0 16px 100px;
-    overflow-x: auto;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 600px;
-  }
+  .table-wrap { padding: 0 16px 100px; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 600px; }
 
   thead th {
-    padding: 10px 12px;
-    text-align: left;
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-    background: var(--surface);
-    position: sticky;
-    top: 0;
+    padding: 10px 12px; text-align: left;
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); border-bottom: 1px solid var(--border);
+    white-space: nowrap; background: var(--surface);
+    position: sticky; top: 0;
   }
-
   thead th:last-child { text-align: center; }
 
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.12s;
-  }
-
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
   tbody tr:hover { background: var(--card); }
+  tbody td { padding: 11px 12px; font-size: 0.83rem; vertical-align: middle; line-height: 1.35; }
 
-  tbody td {
-    padding: 11px 12px;
-    font-size: 0.83rem;
-    vertical-align: middle;
-    line-height: 1.35;
-  }
+  .td-code  { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); white-space: nowrap; }
+  .td-titulo { color: var(--text); max-width: 320px; }
+  .td-titulo mark { background: rgba(30,58,138,0.15); color: var(--accent); border-radius: 2px; padding: 0 1px; }
+  .td-trecho { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+  .td-rev    { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text); text-align: center; }
+  .td-link   { text-align: center; white-space: nowrap; }
 
-  .td-code {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--accent);
-    white-space: nowrap;
-  }
-
-  .td-titulo {
-    color: var(--text);
-    max-width: 320px;
-  }
-
-  .td-titulo mark {
-    background: rgba(30, 58, 138, 0.15);
-    color: var(--accent);
-    border-radius: 2px;
-    padding: 0 1px;
-  }
-
-  .badge-disc {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
+  /* Badges de disciplina */
+  .badge-disc { display: inline-block; padding: 3px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.62rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; }
   .badge-AC { background: rgba(147, 51,234,0.12); color: var(--disc-AC); }
   .badge-AE { background: rgba( 14,165,233,0.12); color: var(--disc-AE); }
   .badge-AQ { background: rgba(236, 72,153,0.12); color: var(--disc-AQ); }
@@ -408,111 +277,70 @@
   .badge-TO { background: rgba(168, 85,247,0.12); color: var(--disc-TO); }
   .badge-TR { background: rgba(  6,182,212,0.12); color: var(--disc-TR); }
 
-  .td-trecho {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    color: var(--muted);
-    white-space: nowrap;
-  }
-
-  .td-rev {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: var(--text);
-    text-align: center;
-  }
-
-  .td-link { text-align: center; }
-
+  /* ─── BOTÃO ABRIR — diferenciado por modo ─── */
   .btn-abrir {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 6px 12px;
-    border-radius: var(--radius);
-    background: rgba(30, 58, 138, 0.08);
-    border: 1px solid rgba(30, 58, 138, 0.3);
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px; border-radius: var(--radius);
+    font-family: var(--font-mono); font-size: 0.65rem;
+    font-weight: 500; letter-spacing: 0.05em;
+    text-decoration: none; text-transform: uppercase;
+    cursor: pointer; transition: all 0.15s;
+    border: 1px solid; white-space: nowrap;
+  }
+  /* modo nuvem — azul escuro (accent) */
+  .btn-abrir.cloud {
+    background: rgba(30,58,138,0.08);
+    border-color: rgba(30,58,138,0.3);
     color: var(--accent);
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    text-decoration: none;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
   }
-
-  .btn-abrir:hover {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
+  .btn-abrir.cloud:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  /* modo local — verde */
+  .btn-abrir.local {
+    background: rgba(22,163,74,0.08);
+    border-color: rgba(22,163,74,0.35);
+    color: var(--local-clr);
   }
+  .btn-abrir.local:hover { background: var(--local-clr); color: #fff; border-color: var(--local-clr); }
 
-  /* ─── EMPTY / LOADING ─── */
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-  }
+  .no-link { color: var(--muted); font-size: 0.65rem; font-family: var(--font-mono); }
 
+  /* ─── EMPTY STATE ─── */
+  .empty-state { text-align: center; padding: 60px 20px; }
   .empty-state .icon { font-size: 2.5rem; opacity: 0.3; }
-  .empty-state p {
-    margin-top: 12px;
-    color: var(--muted);
-    font-size: 0.85rem;
-  }
+  .empty-state p { margin-top: 12px; color: var(--muted); font-size: 0.85rem; }
 
   /* ─── TOAST ─── */
   #toast {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
+    position: fixed; bottom: 24px; left: 50%;
     transform: translateX(-50%) translateY(80px);
-    background: var(--card);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 10px 18px;
-    border-radius: 20px;
-    font-size: 0.78rem;
-    font-family: var(--font-mono);
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--text); padding: 10px 18px; border-radius: 20px;
+    font-size: 0.78rem; font-family: var(--font-mono);
     transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
-    z-index: 200;
-    white-space: nowrap;
+    z-index: 200; white-space: nowrap;
   }
-
   #toast.show { transform: translateX(-50%) translateY(0); }
 
   /* ─── UPDATE BANNER ─── */
   #update-banner {
-    display: none;
-    position: fixed;
-    bottom: 0;
-    left: 0; right: 0;
-    background: var(--accent);
-    color: #000;
-    text-align: center;
-    padding: 12px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    z-index: 300;
-    cursor: pointer;
+    display: none; position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--accent); color: #fff;
+    text-align: center; padding: 12px;
+    font-size: 0.82rem; font-weight: 700;
+    z-index: 300; cursor: pointer;
   }
 
   /* ─── RESPONSIVE ─── */
   @media (max-width: 500px) {
-    .header-top { padding: 12px 14px 8px; }
-    .filters-wrap { padding: 8px 14px 12px; }
-    .table-wrap { padding: 0 8px 100px; }
-    .results-meta { padding: 8px 14px 4px; }
+    .header-top    { padding: 12px 14px 8px; }
+    .filters-wrap  { padding: 8px 14px 12px; }
+    .table-wrap    { padding: 0 8px 100px; }
+    .results-meta  { padding: 8px 14px 4px; }
+    #cfg-panel     { padding: 10px 14px 12px; }
   }
 
   /* ─── ANIMAÇÃO ENTRADA ─── */
-  @keyframes rowIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
+  @keyframes rowIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   tbody tr { animation: rowIn 0.2s ease both; }
 </style>
 </head>
@@ -523,11 +351,35 @@
     <div class="logo-mark"><img src="Aterpa.png" alt="Aterpa"></div>
     <div class="header-title">
       <h1>Consulta de Documentos</h1>
-      <p>Construtora Aterpa - A373 - BR163/MS</p>
+      <p>Construtora Aterpa — A373 — BR163/MS</p>
     </div>
-    <div class="header-status">
-      <div class="status-dot" id="status-dot"></div>
-      <span id="status-label">—</span>
+    <div class="header-right">
+      <!-- Badge de modo: clique para abrir painel de configuração -->
+      <div class="mode-badge checking" id="mode-badge" title="Configurar servidor local">
+        <div class="mode-dot"></div>
+        <span id="mode-label">…</span>
+      </div>
+      <!-- Status de conectividade (online/offline) -->
+      <div class="header-status">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-label">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Painel de configuração do servidor local -->
+  <div id="cfg-panel">
+    <div class="cfg-label">Servidor local — Simple HTTP Server</div>
+    <div class="cfg-row">
+      <input id="cfg-port" type="number" value="8080" min="1024" max="65535" placeholder="Porta (padrão: 8080)">
+      <button class="cfg-btn primary" onclick="saveAndCheck()">Verificar</button>
+      <button class="cfg-btn" onclick="togglePanel()">Fechar</button>
+    </div>
+    <div class="cfg-hint">
+      <strong>① Instale</strong> <em>Simple HTTP Server</em> na Play Store.<br>
+      <strong>② Aponte</strong> o app para a pasta raiz dos projetos no tablet.<br>
+      <strong>③ Inicie</strong> o servidor — os botões ficam verdes automaticamente.<br>
+      Porta padrão do app: <strong>8080</strong>. Altere acima se necessário.
     </div>
   </div>
 
@@ -539,13 +391,13 @@
              autocomplete="off" autocorrect="off" spellcheck="false">
     </div>
 
-    <!-- Disciplinas -->
+    <!-- Disciplinas (geradas dinamicamente) -->
     <span class="filter-label">Disciplinas</span>
     <div class="btn-row" id="disc-btns">
       <button class="filter-btn active" data-disc="TODAS">Todas</button>
     </div>
 
-    <!-- Trechos (seleção múltipla) -->
+    <!-- Trechos — seleção múltipla -->
     <span class="filter-label">Trechos</span>
     <div class="trecho-row" id="trecho-btns"></div>
   </div>
@@ -582,7 +434,9 @@
 </div>
 
 <script>
-// ─── DISCIPLINAS ──────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+// DISCIPLINAS
+// ══════════════════════════════════════════════════════════════════════════
 const DISCIPLINAS = [
   { code: 'AC', nome: 'Adequação de Acessibilidade' },
   { code: 'AE', nome: 'Levantamento Aerofotogramétrico' },
@@ -622,83 +476,100 @@ const DISCIPLINAS = [
 ];
 const DISC_MAP = Object.fromEntries(DISCIPLINAS.map(d => [d.code, d.nome]));
 
-function buildDiscButtons() {
-  const presentDiscs = new Set(allDocs.map(d => d.sigla));
-  const wrap = document.getElementById('disc-btns');
-  // remove botões gerados anteriormente, mantém apenas "TODAS"
-  [...wrap.querySelectorAll('[data-disc]:not([data-disc="TODAS"])')].forEach(b => b.remove());
-  DISCIPLINAS
-    .filter(d => presentDiscs.has(d.code))
-    .forEach(d => {
-      const btn = document.createElement('button');
-      btn.className = 'filter-btn';
-      btn.dataset.disc = d.code;
-      btn.title = d.nome;
-      btn.textContent = `${d.code} — ${d.nome}`;
-      wrap.appendChild(btn);
-    });
-}
-
-// ─── ESTADO ───────────────────────────────────────────────────────────────
-let allDocs = [];
+// ══════════════════════════════════════════════════════════════════════════
+// ESTADO
+// ══════════════════════════════════════════════════════════════════════════
+let allDocs      = [];
 let filteredDocs = [];
-let activeDisc    = 'TODAS';
-let activeTrechos = new Set(); // vazio = todos os trechos
+let lastTerms    = [];
+let activeDisc   = 'TODAS';
+let activeTrechos = new Set(); // seleção múltipla
 
-// ─── SERVIDOR LOCAL ────────────────────────────────────────────────────────
-// Porta padrão do Simple HTTP Server (Play Store). Ajuste se necessário.
-const LOCAL_PORT   = 8080;
-const LOCAL_ORIGIN = `http://localhost:${LOCAL_PORT}`;
-let   servidorLocal = false; // true = servidor local disponível
+// ══════════════════════════════════════════════════════════════════════════
+// CONFIGURAÇÃO DO SERVIDOR LOCAL
+// Porta persistida entre sessões via localStorage
+// ══════════════════════════════════════════════════════════════════════════
+let localPort   = parseInt(localStorage.getItem('localPort') || '8080');
+let localOnline = false;
 
-async function probeServidorLocal() {
+function localBase() { return `http://localhost:${localPort}`; }
+
+// Probe com mode:'no-cors' — funciona mesmo sem headers CORS no servidor
+async function checkLocalServer() {
+  setBadge('checking', '…');
   try {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 2000); // timeout 2 s
-    const resp  = await fetch(`${LOCAL_ORIGIN}/documentos.json`, {
-      signal: ctrl.signal, cache: 'no-store'
-    });
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 2000);
+    await fetch(localBase() + '/', { signal: ctrl.signal, mode: 'no-cors', cache: 'no-store' });
     clearTimeout(timer);
-    servidorLocal = resp.ok;
+    localOnline = true;
+    setBadge('local', `LOCAL :${localPort}`);
+    showToast(`✓ Servidor local ativo — porta ${localPort}`);
   } catch {
-    servidorLocal = false;
+    localOnline = false;
+    setBadge('cloud', 'NUVEM');
   }
+  // Re-renderiza os botões da tabela com o modo correto
+  renderTable(lastTerms);
 }
 
+function setBadge(cls, txt) {
+  document.getElementById('mode-badge').className = 'mode-badge ' + cls;
+  document.getElementById('mode-label').textContent = txt;
+}
+
+function togglePanel() {
+  document.getElementById('cfg-panel').classList.toggle('open');
+}
+
+function saveAndCheck() {
+  const v = parseInt(document.getElementById('cfg-port').value);
+  if (v >= 1024 && v <= 65535) {
+    localPort = v;
+    localStorage.setItem('localPort', String(v));
+  }
+  checkLocalServer();
+}
+
+document.getElementById('mode-badge').addEventListener('click', togglePanel);
+document.getElementById('cfg-port').value = localPort;
+
+// ══════════════════════════════════════════════════════════════════════════
+// RESOLUÇÃO DE LINK — local com subcaminho + encoding seguro / fallback nuvem
+// ══════════════════════════════════════════════════════════════════════════
+/*
+  O documentos.json pode ter dois campos para o arquivo:
+    "arquivo_local": "subpasta/nome do arquivo.pdf"   ← caminho relativo na pasta do servidor
+    "arquivo":       "nome do arquivo.pdf"             ← nome flat (compatibilidade)
+    "link":          "https://..."                     ← fallback nuvem (SharePoint)
+
+  arquivo_local tem prioridade sobre arquivo quando o servidor local está ativo.
+  Espaços e caracteres especiais em nomes de pasta/arquivo são tratados por
+  encodeURIComponent segmento a segmento.
+*/
 function resolveLink(doc) {
-  if (servidorLocal && doc.arquivo) {
-    return `${LOCAL_ORIGIN}/${doc.arquivo}`;
+  if (localOnline) {
+    const localPath = doc.arquivo_local || doc.arquivo;
+    if (localPath) {
+      const encoded = localPath
+        .split('/')
+        .map(seg => encodeURIComponent(seg))
+        .join('/');
+      return { url: `${localBase()}/${encoded}`, modo: 'local' };
+    }
   }
-  return doc.link || null;
+  if (doc.link && !doc.link.includes('...')) {
+    return { url: doc.link, modo: 'cloud' };
+  }
+  return null;
 }
 
-function updateStatusIndicator() {
-  const dot   = document.getElementById('status-dot');
-  const label = document.getElementById('status-label');
-  if (servidorLocal) {
-    dot.className   = 'status-dot local';
-    label.textContent = '📁 Local';
-  } else if (navigator.onLine) {
-    dot.className   = 'status-dot cloud';
-    label.textContent = '☁ Nuvem';
-  } else {
-    dot.className   = 'status-dot offline';
-    label.textContent = 'Offline';
-  }
-}
-
-// ─── CARREGAMENTO DE DADOS ────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+// CARREGAMENTO DE DADOS
+// ══════════════════════════════════════════════════════════════════════════
 async function loadDocumentos() {
-  // 1. Detecta servidor local antes de qualquer coisa
-  await probeServidorLocal();
-  updateStatusIndicator();
-
-  // 2. Tenta carregar documentos.json do servidor local (mais atual)
-  //    ou do próprio diretório do app (deploy SharePoint/web)
-  const urls = servidorLocal
-    ? [`${LOCAL_ORIGIN}/documentos.json`, './documentos.json']
-    : [`./documentos.json?v=${Date.now()}`, './documentos.json'];
-
+  // Tenta carregar documentos.json — sem cache para pegar versão mais atual
+  const urls = [`./documentos.json?v=${Date.now()}`, './documentos.json'];
   let loaded = false;
   for (const url of urls) {
     try {
@@ -718,22 +589,40 @@ async function loadDocumentos() {
   buildDiscButtons();
   buildTrechoButtons();
   applyFilters();
-
-  const origem = servidorLocal ? '📁 Servidor local' : '☁ Nuvem';
-  showToast(`${allDocs.length} documentos — ${origem}`);
+  showToast(`${allDocs.length} documentos carregados`);
 }
 
-// ─── BOTÕES DE TRECHO (seleção múltipla) ─────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+// BOTÕES DE DISCIPLINA (dinâmicos — apenas os presentes no JSON)
+// ══════════════════════════════════════════════════════════════════════════
+function buildDiscButtons() {
+  const presentDiscs = new Set(allDocs.map(d => d.sigla));
+  const wrap = document.getElementById('disc-btns');
+  [...wrap.querySelectorAll('[data-disc]:not([data-disc="TODAS"])')].forEach(b => b.remove());
+  DISCIPLINAS
+    .filter(d => presentDiscs.has(d.code))
+    .forEach(d => {
+      const btn = document.createElement('button');
+      btn.className    = 'filter-btn';
+      btn.dataset.disc = d.code;
+      btn.title        = d.nome;
+      btn.textContent  = `${d.code} — ${d.nome}`;
+      wrap.appendChild(btn);
+    });
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// BOTÕES DE TRECHO (seleção múltipla)
+// ══════════════════════════════════════════════════════════════════════════
 function buildTrechoButtons() {
   const trechos = [...new Set(allDocs.map(d => d.trecho))].sort();
   const wrap = document.getElementById('trecho-btns');
   wrap.innerHTML = '';
-
   trechos.forEach(t => {
     const btn = document.createElement('button');
-    btn.className = 'filter-btn';
+    btn.className      = 'filter-btn';
     btn.dataset.trecho = t;
-    btn.textContent = t;
+    btn.textContent    = t;
     btn.addEventListener('click', () => {
       if (activeTrechos.has(t)) {
         activeTrechos.delete(t);
@@ -748,89 +637,78 @@ function buildTrechoButtons() {
   });
 }
 
-// ─── FILTROS ──────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+// FILTROS
+// ══════════════════════════════════════════════════════════════════════════
 function normalize(str) {
-  return (str || '').toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
 function applyFilters() {
   const query = normalize(document.getElementById('search').value.trim());
-  const terms  = query.split(/\s+/).filter(Boolean);
+  const terms = query.split(/\s+/).filter(Boolean);
+  lastTerms   = terms;
 
   filteredDocs = allDocs.filter(doc => {
     if (activeDisc !== 'TODAS' && doc.sigla !== activeDisc) return false;
     if (activeTrechos.size > 0 && !activeTrechos.has(doc.trecho)) return false;
-
-    if (terms.length === 0) return true;
-
-    const haystack = normalize(
-      [doc.codigo, doc.titulo, doc.palavras_chave, doc.disciplina, doc.trecho].join(' ')
-    );
-    return terms.every(t => haystack.includes(t));
+    if (!terms.length) return true;
+    const hay = normalize([doc.codigo, doc.titulo, doc.palavras_chave, doc.disciplina, doc.trecho].join(' '));
+    return terms.every(t => hay.includes(t));
   });
 
   renderTable(terms);
   document.getElementById('count-label').textContent = filteredDocs.length;
 }
 
-// ─── RENDER TABLE ─────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════════════════════════
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
 function highlight(text, terms) {
   if (!terms.length) return escHtml(text);
-  let result = escHtml(text);
-  terms.forEach(term => {
-    const re = new RegExp(escRegex(term), 'gi');
-    result = result.replace(re, m => `<mark>${m}</mark>`);
-  });
-  return result;
-}
-
-function escHtml(s) {
-  return String(s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function escRegex(s) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  let r = escHtml(text);
+  terms.forEach(t => { r = r.replace(new RegExp(escRegex(t), 'gi'), m => `<mark>${m}</mark>`); });
+  return r;
 }
 
 function renderTable(terms = []) {
   const tbody = document.getElementById('tbody');
   const empty = document.getElementById('empty-state');
 
-  if (filteredDocs.length === 0) {
-    tbody.innerHTML = '';
-    empty.style.display = '';
-    return;
-  }
-
+  if (!filteredDocs.length) { tbody.innerHTML = ''; empty.style.display = ''; return; }
   empty.style.display = 'none';
 
   tbody.innerHTML = filteredDocs.map((doc, i) => {
-    const href = resolveLink(doc);
+    const res = resolveLink(doc);
+    let btnHtml;
+    if (res) {
+      const icon  = res.modo === 'local' ? '📁' : '↗';
+      const title = res.modo === 'local' ? 'Abrir arquivo local' : 'Abrir na nuvem';
+      btnHtml = `<a class="btn-abrir ${res.modo}" href="${escHtml(res.url)}" target="_blank" rel="noopener" title="${title}">${icon} Abrir</a>`;
+    } else {
+      btnHtml = `<span class="no-link">— sem link —</span>`;
+    }
     return `
-    <tr style="animation-delay:${Math.min(i * 0.03, 0.3)}s">
-      <td class="td-code">${highlight(doc.codigo, terms)}</td>
-      <td class="td-titulo">${highlight(doc.titulo, terms)}</td>
-      <td><span class="badge-disc badge-${escHtml(doc.sigla)}" title="${escHtml(DISC_MAP[doc.sigla] || doc.disciplina)}">
-        ${escHtml(doc.sigla)}</span></td>
-      <td class="td-trecho">${escHtml(doc.trecho)}</td>
-      <td class="td-rev">${escHtml(doc.revisao)}</td>
-      <td class="td-link">
-        ${href && href !== 'https://onedrive.live.com/...'
-          ? `<a class="btn-abrir" href="${escHtml(href)}" target="_blank" rel="noopener">
-               ↗ Abrir
-             </a>`
-          : `<span style="color:var(--muted);font-size:0.65rem;font-family:var(--font-mono)">— sem link —</span>`
-        }
-      </td>
-    </tr>`;
+      <tr style="animation-delay:${Math.min(i * 0.03, 0.3)}s">
+        <td class="td-code">${highlight(doc.codigo, terms)}</td>
+        <td class="td-titulo">${highlight(doc.titulo, terms)}</td>
+        <td><span class="badge-disc badge-${escHtml(doc.sigla)}" title="${escHtml(DISC_MAP[doc.sigla] || doc.disciplina)}">${escHtml(doc.sigla)}</span></td>
+        <td class="td-trecho">${escHtml(doc.trecho)}</td>
+        <td class="td-rev">${escHtml(doc.revisao)}</td>
+        <td class="td-link">${btnHtml}</td>
+      </tr>`;
   }).join('');
 }
 
-// ─── EVENTOS ──────────────────────────────────────────────────────────────
-document.getElementById('search').addEventListener('input', () => applyFilters());
+// ══════════════════════════════════════════════════════════════════════════
+// EVENTOS
+// ══════════════════════════════════════════════════════════════════════════
+document.getElementById('search').addEventListener('input', applyFilters);
 
 document.getElementById('disc-btns').addEventListener('click', e => {
   const btn = e.target.closest('.filter-btn');
@@ -852,11 +730,25 @@ document.getElementById('clear-btn').addEventListener('click', () => {
   applyFilters();
 });
 
-// ─── STATUS ONLINE/OFFLINE ────────────────────────────────────────────────
-window.addEventListener('online',  updateStatusIndicator);
-window.addEventListener('offline', updateStatusIndicator);
+// Status online / offline
+function updateNetworkStatus() {
+  const dot   = document.getElementById('status-dot');
+  const label = document.getElementById('status-label');
+  dot.className     = 'status-dot ' + (navigator.onLine ? 'online' : 'offline');
+  label.textContent = navigator.onLine ? 'Online' : 'Offline';
+}
+window.addEventListener('online',  updateNetworkStatus);
+window.addEventListener('offline', updateNetworkStatus);
+updateNetworkStatus();
 
-// ─── TOAST ────────────────────────────────────────────────────────────────
+// Revalida servidor local ao retornar para a aba (usuário pode ter iniciado o servidor)
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) checkLocalServer();
+});
+
+// ══════════════════════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════════════════════
 let toastTimer;
 function showToast(msg) {
   const el = document.getElementById('toast');
@@ -866,7 +758,9 @@ function showToast(msg) {
   toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
 }
 
-// ─── SERVICE WORKER ───────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+// SERVICE WORKER
+// ══════════════════════════════════════════════════════════════════════════
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').then(reg => {
     reg.addEventListener('updatefound', () => {
@@ -880,8 +774,11 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+// INIT — carrega dados e detecta servidor em paralelo
+// ══════════════════════════════════════════════════════════════════════════
 loadDocumentos();
+checkLocalServer();
 </script>
 </body>
 </html>
