@@ -509,7 +509,8 @@ let localPort   = parseInt(localStorage.getItem('localPort') || '8080');
 // localOnline: false = nuvem automático | true = local detectado | 'manual' = forçado pelo usuário
 let localOnline = false;
 
-function localBase() { return `http://localhost:${localPort}`; }
+//function localBase() { return `http://localhost:${localPort}`; }
+function localBase() { return 'file:///storage/emulated/0/documents/A373_Projetos/Ano01/';}
 function isLocal()   { return localOnline === true || localOnline === 'manual'; }
 
 // ── PROBE DO SERVIDOR LOCAL ──────────────────────────────────────────────
@@ -659,7 +660,7 @@ async function loadDocumentos() {
       if (!resp.ok) continue;
       allDocs = await resp.json();
       loaded  = true;
-      origem  = url.startsWith('http://localhost') ? '📁 Servidor local'
+      origem  = url.startsWith('file:///storage/emulated') ? '📁 Servidor local'
               : url.includes('v=')                 ? '☁ Nuvem'
               :                                      '⚡ Cache offline';
       break;
