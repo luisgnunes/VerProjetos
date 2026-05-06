@@ -383,7 +383,7 @@
   </div>
 
   <!-- Painel de configuração do servidor local -->
-  <!-- <div id="cfg-panel">
+  <div id="cfg-panel">
     <div class="cfg-label">Servidor local — Simple HTTP Server</div>
     <div class="cfg-row">
       <input id="cfg-port" type="number" value="8080" min="1024" max="65535" placeholder="Porta (padrão: 8080)">
@@ -397,7 +397,7 @@
       Porta padrão do app: <strong>8080</strong>. Altere acima se necessário.
     </div>
   </div>
-  -->
+
   <div class="filters-wrap">
     <!-- Busca -->
     <div class="search-row">
@@ -509,8 +509,7 @@ let localPort   = parseInt(localStorage.getItem('localPort') || '8080');
 // localOnline: false = nuvem automático | true = local detectado | 'manual' = forçado pelo usuário
 let localOnline = false;
 
-//function localBase() { return `http://localhost:${localPort}`; }
-function localBase() { return 'file:///storage/emulated/0/documents/A373_Projetos/Ano01/';}
+function localBase() { return `http://localhost:${localPort}`; }
 function isLocal()   { return localOnline === true || localOnline === 'manual'; }
 
 // ── PROBE DO SERVIDOR LOCAL ──────────────────────────────────────────────
@@ -525,13 +524,9 @@ async function checkLocalServer(rerender = false) {
   applyBadge(rerender);
 }
 
-function localModeLabel(suffix = '') {
-  return localBase().startsWith('file://') ? `LOCAL${suffix}` : `LOCAL :${localPort}${suffix}`;
-}
-
 function applyBadge(rerender = false) {
   if (isLocal()) {
-    setBadge('local', localModeLabel());
+    setBadge('local', `LOCAL :${localPort}`);
   } else {
     setBadge('cloud', 'NUVEM');
     // Exibe toast com opção de forçar modo local
@@ -540,9 +535,8 @@ function applyBadge(rerender = false) {
   }
   if (rerender) {
     renderTable(lastTerms);
-    const fileMode = localBase().startsWith('file://');
-    if (localOnline === true) showToast(fileMode ? '✓ Modo local ativo' : `✓ Servidor local ativo — porta ${localPort}`);
-    if (localOnline === 'manual') showToast(fileMode ? '📁 Modo local ativado manualmente' : `📁 Modo local ativado manualmente — porta ${localPort}`);
+    if (localOnline === true) showToast(`✓ Servidor local ativo — porta ${localPort}`);
+    if (localOnline === 'manual') showToast(`📁 Modo local ativado manualmente — porta ${localPort}`);
   }
 }
 
@@ -562,10 +556,9 @@ function showToastCloud() {
 function forceLocalMode() {
   localOnline = 'manual';
   localStorage.setItem('localMode', 'manual');
-  setBadge('local', localModeLabel(' ★'));
+  setBadge('local', `LOCAL :${localPort} ★`);
   renderTable(lastTerms);
-  const fileMode = localBase().startsWith('file://');
-  showToast(fileMode ? '📁 Modo local ativado' : `📁 Modo local ativado — porta ${localPort}`);
+  showToast(`📁 Modo local ativado — porta ${localPort}`);
 }
 
 // Cancela modo manual (volta para auto-detecção)
@@ -576,8 +569,6 @@ function resetToAuto() {
 }
 
 function probeLocal() {
-  // file:// não tem servidor para sondar — assume ativo diretamente
-  if (localBase().startsWith('file://')) return Promise.resolve(true);
   return new Promise(resolve => {
     const img = new Image();
     img.src = localBase() + '/documentos.json?' + Date.now();
@@ -593,18 +584,14 @@ function setBadge(cls, txt) {
 }
 
 function togglePanel() {
-  const panel = document.getElementById('cfg-panel');
-  if (panel) panel.classList.toggle('open');
+  document.getElementById('cfg-panel').classList.toggle('open');
 }
 
 function saveAndCheck() {
-  const portEl = document.getElementById('cfg-port');
-  if (portEl) {
-    const v = parseInt(portEl.value);
-    if (v >= 1024 && v <= 65535) {
-      localPort = v;
-      localStorage.setItem('localPort', String(v));
-    }
+  const v = parseInt(document.getElementById('cfg-port').value);
+  if (v >= 1024 && v <= 65535) {
+    localPort = v;
+    localStorage.setItem('localPort', String(v));
   }
   // Ao mudar porta, reseta modo manual e refaz detecção
   localOnline = false;
@@ -613,8 +600,7 @@ function saveAndCheck() {
 }
 
 document.getElementById('mode-badge').addEventListener('click', togglePanel);
-const _cfgPort = document.getElementById('cfg-port');
-if (_cfgPort) _cfgPort.value = localPort;
+document.getElementById('cfg-port').value = localPort;
 
 // Duplo clique no badge local cancela modo manual e volta para auto
 document.getElementById('mode-badge').addEventListener('dblclick', e => {
@@ -673,9 +659,9 @@ async function loadDocumentos() {
       if (!resp.ok) continue;
       allDocs = await resp.json();
       loaded  = true;
-      origem  = url.startsWith('file://')  ? '📁 Arquivo local'
-              : url.includes('v=')        ? '☁ Nuvem'
-              :                             '⚡ Cache offline';
+      origem  = url.startsWith('http://localhost') ? '📁 Servidor local'
+              : url.includes('v=')                 ? '☁ Nuvem'
+              :                                      '⚡ Cache offline';
       break;
     } catch { /* tenta próxima */ }
   }
@@ -843,7 +829,7 @@ window.addEventListener('offline', () => {
   if (!isLocal()) {
     localOnline = 'manual';
     localStorage.setItem('localMode', 'manual');
-    setBadge('local', localModeLabel(' ★'));
+    setBadge('local', `LOCAL :${localPort} ★`);
     renderTable(lastTerms);
     showToast('📶 Offline — modo local ativado automaticamente');
   }
@@ -901,7 +887,7 @@ if ('serviceWorker' in navigator) {
   // Restaura modo manual persistido (usuário escolheu local na sessão anterior)
   if (localStorage.getItem('localMode') === 'manual') {
     localOnline = 'manual';
-    setBadge('local', localModeLabel(' ★'));
+    setBadge('local', `LOCAL :${localPort} ★`);
   } else {
     await checkLocalServer(); // probe automático
   }
