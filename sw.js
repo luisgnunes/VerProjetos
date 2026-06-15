@@ -1,8 +1,9 @@
-const CACHE_NAME = 'projetos-infra-v2.7';
+const CACHE_NAME = 'projetos-infra-v2.8';
 const ASSETS = [
   './',
   './index.html',
   './documentos.json',
+  './filtros.json',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'

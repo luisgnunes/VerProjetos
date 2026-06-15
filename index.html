@@ -406,15 +406,21 @@
              autocomplete="off" autocorrect="off" spellcheck="false">
     </div>
 
-    <!-- Disciplinas (geradas dinamicamente) -->
+    <!-- Anos -->
+    <span class="filter-label">Ano</span>
+    <div class="btn-row" id="ano-btns">
+      <button class="filter-btn active" data-ano="todos">Todos</button>
+    </div>
+
+    <!-- Trechos — seleção múltipla, dependente do Ano -->
+    <span class="filter-label">Trechos</span>
+    <div class="trecho-row" id="trecho-btns"></div>
+
+    <!-- Disciplinas (geradas dinamicamente — dependente do Ano e Trechos) -->
     <span class="filter-label">Disciplinas</span>
     <div class="btn-row" id="disc-btns">
       <button class="filter-btn active" data-disc="TODAS">Todas</button>
     </div>
-
-    <!-- Trechos — seleção múltipla -->
-    <span class="filter-label">Trechos</span>
-    <div class="trecho-row" id="trecho-btns"></div>
   </div>
 </header>
 
@@ -498,7 +504,9 @@ let allDocs      = [];
 let filteredDocs = [];
 let lastTerms    = [];
 let activeDisc   = 'TODAS';
+let activeAno    = 'todos';
 let activeTrechos = new Set(); // seleção múltipla
+let filtros      = null;       // dados pré-computados de filtros.json
 
 // ══════════════════════════════════════════════════════════════════════════
 // CONFIGURAÇÃO DO SERVIDOR LOCAL
@@ -644,6 +652,21 @@ function resolveLink(doc) {
 //   2. Mesma origem ./documentos.json — deploy web normal
 //   3. Cache do Service Worker — fallback offline
 // ══════════════════════════════════════════════════════════════════════════
+async function loadFiltros() {
+  const urls = [];
+  if (localOnline) urls.push(localBase() + '/filtros.json');
+  urls.push(`./filtros.json?v=${Date.now()}`);
+  urls.push('./filtros.json');
+  for (const url of urls) {
+    try {
+      const resp = await fetch(url, { cache: url.includes('v=') ? 'no-store' : 'default' });
+      if (!resp.ok) continue;
+      filtros = await resp.json();
+      break;
+    } catch { /* tenta próxima */ }
+  }
+}
+
 async function loadDocumentos() {
   // Monta lista de URLs para tentar, em ordem de prioridade
   const urls = [];
@@ -671,36 +694,44 @@ async function loadDocumentos() {
     return;
   }
 
-  buildDiscButtons();
+  buildAnoButtons();
   buildTrechoButtons();
+  buildDiscButtons();
   applyFilters();
   showToast(`${allDocs.length} docs — ${origem}`);
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// BOTÕES DE DISCIPLINA (dinâmicos — apenas os presentes no JSON)
+// BOTÕES DE ANO
 // ══════════════════════════════════════════════════════════════════════════
-function buildDiscButtons() {
-  const presentDiscs = new Set(allDocs.map(d => d.sigla));
-  const wrap = document.getElementById('disc-btns');
-  [...wrap.querySelectorAll('[data-disc]:not([data-disc="TODAS"])')].forEach(b => b.remove());
-  DISCIPLINAS
-    .filter(d => presentDiscs.has(d.code))
-    .forEach(d => {
-      const btn = document.createElement('button');
-      btn.className    = 'filter-btn';
-      btn.dataset.disc = d.code;
-      btn.title        = d.nome;
-      btn.textContent  = `${d.code} — ${d.nome}`;
-      wrap.appendChild(btn);
-    });
+function buildAnoButtons() {
+  const anos = filtros ? filtros.anos
+    : [...new Set(allDocs.map(d => d.ano).filter(Boolean))].sort();
+  const wrap = document.getElementById('ano-btns');
+  [...wrap.querySelectorAll('[data-ano]:not([data-ano="todos"])')].forEach(b => b.remove());
+  anos.forEach(ano => {
+    const btn = document.createElement('button');
+    btn.className   = 'filter-btn';
+    btn.dataset.ano = ano;
+    btn.textContent = `Ano ${ano}`;
+    if (ano === activeAno) btn.classList.add('active');
+    wrap.appendChild(btn);
+  });
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// BOTÕES DE TRECHO (seleção múltipla)
+// BOTÕES DE TRECHO (dependem do Ano selecionado)
 // ══════════════════════════════════════════════════════════════════════════
 function buildTrechoButtons() {
-  const trechos = [...new Set(allDocs.map(d => d.trecho))].sort();
+  const trechos = filtros
+    ? (filtros.trechos[activeAno] || filtros.trechos['todos'] || [])
+    : [...new Set(allDocs
+        .filter(d => activeAno === 'todos' || d.ano === activeAno)
+        .map(d => d.trecho))].sort();
+
+  // Remove trechos ativos que não existem mais no ano selecionado
+  activeTrechos = new Set([...activeTrechos].filter(t => trechos.includes(t)));
+
   const wrap = document.getElementById('trecho-btns');
   wrap.innerHTML = '';
   trechos.forEach(t => {
@@ -708,6 +739,7 @@ function buildTrechoButtons() {
     btn.className      = 'filter-btn';
     btn.dataset.trecho = t;
     btn.textContent    = t;
+    if (activeTrechos.has(t)) btn.classList.add('active');
     btn.addEventListener('click', () => {
       if (activeTrechos.has(t)) {
         activeTrechos.delete(t);
@@ -716,10 +748,56 @@ function buildTrechoButtons() {
         activeTrechos.add(t);
         btn.classList.add('active');
       }
+      buildDiscButtons();
       applyFilters();
     });
     wrap.appendChild(btn);
   });
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// BOTÕES DE DISCIPLINA (dependem do Ano e Trechos selecionados)
+// ══════════════════════════════════════════════════════════════════════════
+function buildDiscButtons() {
+  let presentDiscs;
+
+  if (filtros) {
+    const anoDiscs = filtros.disciplinas[activeAno] || filtros.disciplinas['todos'] || {};
+    if (activeTrechos.size === 0) {
+      presentDiscs = new Set(anoDiscs['todos'] || []);
+    } else {
+      presentDiscs = new Set();
+      activeTrechos.forEach(t => (anoDiscs[t] || []).forEach(s => presentDiscs.add(s)));
+    }
+  } else {
+    presentDiscs = new Set(
+      allDocs
+        .filter(d => activeAno === 'todos' || d.ano === activeAno)
+        .filter(d => activeTrechos.size === 0 || activeTrechos.has(d.trecho))
+        .map(d => d.sigla)
+    );
+  }
+
+  const wrap = document.getElementById('disc-btns');
+  [...wrap.querySelectorAll('[data-disc]:not([data-disc="TODAS"])')].forEach(b => b.remove());
+
+  // Se a disciplina ativa deixou de existir na seleção atual, reset para TODAS
+  if (activeDisc !== 'TODAS' && !presentDiscs.has(activeDisc)) {
+    activeDisc = 'TODAS';
+    wrap.querySelector('[data-disc="TODAS"]').classList.add('active');
+  }
+
+  DISCIPLINAS
+    .filter(d => presentDiscs.has(d.code))
+    .forEach(d => {
+      const btn = document.createElement('button');
+      btn.className    = 'filter-btn';
+      btn.dataset.disc = d.code;
+      btn.title        = d.nome;
+      btn.textContent  = `${d.code} — ${d.nome}`;
+      if (d.code === activeDisc) btn.classList.add('active');
+      wrap.appendChild(btn);
+    });
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -735,6 +813,7 @@ function applyFilters() {
   lastTerms   = terms;
 
   filteredDocs = allDocs.filter(doc => {
+    if (activeAno !== 'todos' && doc.ano !== activeAno) return false;
     if (activeDisc !== 'TODAS' && doc.sigla !== activeDisc) return false;
     if (activeTrechos.size > 0 && !activeTrechos.has(doc.trecho)) return false;
     if (!terms.length) return true;
@@ -795,6 +874,20 @@ function renderTable(terms = []) {
 // ══════════════════════════════════════════════════════════════════════════
 document.getElementById('search').addEventListener('input', applyFilters);
 
+document.getElementById('ano-btns').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  activeAno = btn.dataset.ano;
+  document.querySelectorAll('#ano-btns .filter-btn')
+    .forEach(b => b.classList.toggle('active', b.dataset.ano === activeAno));
+  activeTrechos = new Set();  // reset trechos ao mudar de ano
+  activeDisc    = 'TODAS';   // reset disciplina ao mudar de ano
+  document.querySelector('#disc-btns .filter-btn[data-disc="TODAS"]').classList.add('active');
+  buildTrechoButtons();
+  buildDiscButtons();
+  applyFilters();
+});
+
 document.getElementById('disc-btns').addEventListener('click', e => {
   const btn = e.target.closest('.filter-btn');
   if (!btn) return;
@@ -806,12 +899,15 @@ document.getElementById('disc-btns').addEventListener('click', e => {
 
 document.getElementById('clear-btn').addEventListener('click', () => {
   document.getElementById('search').value = '';
+  activeAno     = 'todos';
   activeDisc    = 'TODAS';
   activeTrechos = new Set();
+  document.querySelectorAll('#ano-btns .filter-btn')
+    .forEach(b => b.classList.toggle('active', b.dataset.ano === 'todos'));
   document.querySelectorAll('#disc-btns .filter-btn')
     .forEach(b => b.classList.toggle('active', b.dataset.disc === 'TODAS'));
-  document.querySelectorAll('#trecho-btns .filter-btn')
-    .forEach(b => b.classList.remove('active'));
+  buildTrechoButtons();
+  buildDiscButtons();
   applyFilters();
 });
 
@@ -891,6 +987,7 @@ if ('serviceWorker' in navigator) {
   } else {
     await checkLocalServer(); // probe automático
   }
+  await loadFiltros();
   await loadDocumentos();
 })();
 </script>

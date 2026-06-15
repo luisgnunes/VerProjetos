@@ -45,6 +45,7 @@ COL_MAP = {
     "titulo":        "TÍTULO",
     "disciplina":    "DISCIPLINA",
     "sigla":         "SIGLA",
+    "ano":           "ANO",
     "trecho":        "TRECHO",
     "revisao":       "REVISÃO",
     "palavras_chave":"PALAVRAS-CHAVE",
@@ -104,6 +105,53 @@ def mapear_colunas(cabecalho, col_map):
     return indices
 
 
+def gerar_filtros(documentos: list, json_path: str):
+    """
+    Gera filtros.json com anos, trechos e disciplinas pré-computadas por
+    combinação ano×trecho — evita que o JavaScript precise calcular isso.
+    """
+    from collections import defaultdict
+
+    anos = sorted(set(d.get("ano", "") for d in documentos if d.get("ano")))
+
+    # trechos por ano
+    t_por_a: dict = defaultdict(set)
+    for d in documentos:
+        a, t = d.get("ano", ""), d.get("trecho", "")
+        if t:
+            t_por_a["todos"].add(t)
+            if a:
+                t_por_a[a].add(t)
+    trechos = {k: sorted(v) for k, v in t_por_a.items()}
+
+    # disciplinas por ano × trecho
+    disc: dict = defaultdict(lambda: defaultdict(set))
+    for d in documentos:
+        a, t, s = d.get("ano", ""), d.get("trecho", ""), d.get("sigla", "")
+        if not s:
+            continue
+        disc["todos"]["todos"].add(s)
+        if t:
+            disc["todos"][t].add(s)
+        if a:
+            disc[a]["todos"].add(s)
+            if t:
+                disc[a][t].add(s)
+
+    disciplinas = {
+        ano: {trecho: sorted(siglas) for trecho, siglas in td.items()}
+        for ano, td in disc.items()
+    }
+
+    filtros = {"anos": anos, "trechos": trechos, "disciplinas": disciplinas}
+    filtros_path = Path(json_path).parent / "filtros.json"
+    filtros_path.write_text(
+        json.dumps(filtros, ensure_ascii=False, indent=2),
+        encoding="utf-8"
+    )
+    print(f"✅ filtros.json → {filtros_path}")
+
+
 def converter(excel_path: str, json_path: str):
     print(f"📂 Lendo: {excel_path}")
     rows = ler_excel(Path(excel_path), SHEET_NAME)
@@ -128,6 +176,7 @@ def converter(excel_path: str, json_path: str):
             "codigo":        codigo,
             "titulo":        normalizar(row[indices["titulo"]])        if "titulo"        in indices else "",
             "disciplina":    disc_upper                                if disc_upper in DISCIPLINAS_VALIDAS else disc_upper,
+            "ano":           normalizar(row[indices["ano"]])           if "ano"           in indices else "",
             "trecho":        normalizar(row[indices["trecho"]])        if "trecho"        in indices else "",
             "revisao":       normalizar(row[indices["revisao"]])       if "revisao"       in indices else "",
             "palavras_chave":normalizar(row[indices["palavras_chave"]]) if "palavras_chave" in indices else "",
@@ -149,6 +198,8 @@ def converter(excel_path: str, json_path: str):
     print(f"✅ {len(documentos)} documentos exportados → {json_path}")
     if ignorados:
         print(f"   ({ignorados} linhas sem código ignoradas)")
+
+    gerar_filtros(documentos, json_path)
 
 
 if __name__ == "__main__":
