@@ -203,6 +203,57 @@
   .trecho-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
   .trecho-row::-webkit-scrollbar { display: none; }
 
+  .disc-accordion {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .disc-accordion summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .disc-accordion summary::-webkit-details-marker { display: none; }
+  .disc-accordion-summary {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+  }
+  #disc-summary-title {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+  #disc-summary-meta {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .disc-chevron {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+  }
+  .disc-accordion[open] .disc-chevron { transform: rotate(180deg); }
+  .disc-accordion-body {
+    padding: 2px 10px 10px;
+    border-top: 1px solid var(--border);
+  }
+
   /* ─── RESULTADOS ─── */
   .results-meta {
     padding: 10px 20px 6px;
@@ -345,6 +396,42 @@
     z-index: 300; cursor: pointer;
   }
 
+  /* ─── BOTÃO VOLTAR AOS FILTROS ─── */
+  .filters-fab {
+    position: fixed;
+    right: 16px;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 1px solid rgba(30,58,138,0.35);
+    background: rgba(30,58,138,0.92);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 24px rgba(30,58,138,0.28);
+    cursor: pointer;
+    z-index: 250;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+  }
+  .filters-fab.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .filters-fab:hover { background: var(--accent); }
+  .filters-fab svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+  }
+
   /* ─── RESPONSIVE ─── */
   @media (max-width: 500px) {
     .header-top    { padding: 12px 14px 8px; }
@@ -398,7 +485,9 @@
     </div>
   </div>
 
-  <div class="filters-wrap">
+</header>
+
+<div class="filters-wrap" id="filtros">
     <!-- Busca -->
     <div class="search-row">
       <span class="search-icon">⌕</span>
@@ -416,13 +505,22 @@
     <span class="filter-label">Trechos</span>
     <div class="trecho-row" id="trecho-btns"></div>
 
-    <!-- Disciplinas (geradas dinamicamente — dependente do Ano e Trechos) -->
+    <!-- Disciplinas (recolhível) -->
     <span class="filter-label">Disciplinas</span>
-    <div class="btn-row" id="disc-btns">
-      <button class="filter-btn active" data-disc="TODAS">Todas</button>
-    </div>
+    <details class="disc-accordion" id="disc-accordion">
+      <summary>
+        <div class="disc-accordion-summary">
+          <span id="disc-summary-meta">Todas</span>
+        </div>
+        <span class="disc-chevron">▾</span>
+      </summary>
+      <div class="disc-accordion-body">
+        <div class="btn-row" id="disc-btns">
+          <button class="filter-btn active" data-disc="TODAS">Todas</button>
+        </div>
+      </div>
+    </details>
   </div>
-</header>
 
 <div class="results-meta">
   <span><span id="count-label">0</span> documentos encontrados</span>
@@ -453,6 +551,12 @@
 <div id="update-banner" onclick="window.location.reload()">
   🔄 Nova versão disponível — toque para atualizar
 </div>
+
+<button class="filters-fab" id="filters-fab" aria-label="Voltar aos filtros" title="Voltar aos filtros">
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M4 6h16l-6.5 7.5v4.8l-3 1.7v-6.5z"></path>
+  </svg>
+</button>
 
 <script>
 // ══════════════════════════════════════════════════════════════════════════
@@ -798,6 +902,21 @@ function buildDiscButtons() {
       if (d.code === activeDisc) btn.classList.add('active');
       wrap.appendChild(btn);
     });
+
+  updateDiscAccordionMeta(presentDiscs.size);
+}
+
+function updateDiscAccordionMeta(qtdDisciplinas = 0) {
+  const meta = document.getElementById('disc-summary-meta');
+  if (!meta) return;
+
+  if (activeDisc === 'TODAS') {
+    meta.textContent = `${qtdDisciplinas} opções · Todas`;
+    return;
+  }
+
+  const nome = DISC_MAP[activeDisc] || activeDisc;
+  meta.textContent = `${qtdDisciplinas} opções · ${activeDisc} — ${nome}`;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -894,6 +1013,11 @@ document.getElementById('disc-btns').addEventListener('click', e => {
   activeDisc = btn.dataset.disc;
   document.querySelectorAll('#disc-btns .filter-btn')
     .forEach(b => b.classList.toggle('active', b.dataset.disc === activeDisc));
+  if (activeDisc !== 'TODAS') {
+    document.getElementById('disc-accordion').open = false;
+  }
+  const totalDisciplinas = document.querySelectorAll('#disc-btns [data-disc]:not([data-disc="TODAS"])').length;
+  updateDiscAccordionMeta(totalDisciplinas);
   applyFilters();
 });
 
@@ -947,6 +1071,21 @@ updateNetworkStatus();
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) checkLocalServer(true);
 });
+
+// Botão flutuante para voltar aos filtros
+const filtersFab = document.getElementById('filters-fab');
+const filtrosSection = document.getElementById('filtros');
+
+function toggleFiltersFab() {
+  filtersFab.classList.toggle('visible', window.scrollY > 280);
+}
+
+filtersFab.addEventListener('click', () => {
+  filtrosSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+window.addEventListener('scroll', toggleFiltersFab, { passive: true });
+toggleFiltersFab();
 
 // ══════════════════════════════════════════════════════════════════════════
 // TOAST
