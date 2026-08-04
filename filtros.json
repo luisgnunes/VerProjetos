@@ -3,7 +3,12 @@
     "01",
     "02"
   ],
-  "trechos": {
+  "grupos": [
+    "principal",
+    "acessos",
+    "licença"
+  ],
+  "obras": {
     "todos": [
       "366-369",
       "373-385",
@@ -21,7 +26,10 @@
       "638-NORTE",
       "647-650",
       "702-NORTE",
-      "730-732"
+      "730-732",
+      "AGUA",
+      "AMBIENTAL",
+      "TRANSPORTE"
     ],
     "01": [
       "452-454",
@@ -37,12 +45,14 @@
       "634-RET",
       "638-NORTE",
       "702-NORTE",
-      "730-732"
+      "730-732",
+      "AMBIENTAL"
     ],
     "02": [
       "366-369",
       "373-385",
-      "647-650"
+      "647-650",
+      "AMBIENTAL"
     ]
   },
   "disciplinas": {
@@ -59,6 +69,7 @@
         "GG",
         "HI",
         "IN",
+        "MA",
         "OC",
         "PA",
         "PV",
@@ -309,6 +320,15 @@
         "TE",
         "TO",
         "TR"
+      ],
+      "AMBIENTAL": [
+        "MA"
+      ],
+      "AGUA": [
+        "MA"
+      ],
+      "TRANSPORTE": [
+        "MA"
       ]
     },
     "01": {
@@ -324,6 +344,7 @@
         "GG",
         "HI",
         "IN",
+        "MA",
         "OC",
         "PA",
         "PV",
@@ -530,6 +551,9 @@
         "TE",
         "TO",
         "TR"
+      ],
+      "AMBIENTAL": [
+        "MA"
       ]
     },
     "02": {
@@ -541,6 +565,7 @@
         "GE",
         "GG",
         "IN",
+        "MA",
         "PA",
         "PV",
         "SI",
@@ -591,7 +616,1298 @@
         "TE",
         "TO",
         "TR"
+      ],
+      "AMBIENTAL": [
+        "MA"
       ]
+    }
+  },
+  "obras_por_ano_grupo": {
+    "todos": {
+      "todos": [
+        "366-369",
+        "373-385",
+        "452-454",
+        "454-460",
+        "510-511",
+        "512-NORTE",
+        "515-NORTE",
+        "515-SUL",
+        "520-NORTE",
+        "521-NORTE",
+        "535-545",
+        "626-628",
+        "634-RET",
+        "638-NORTE",
+        "647-650",
+        "702-NORTE",
+        "730-732",
+        "AGUA",
+        "AMBIENTAL",
+        "TRANSPORTE"
+      ],
+      "principal": [
+        "366-369",
+        "373-385",
+        "452-454",
+        "454-460",
+        "510-511",
+        "535-545",
+        "626-628",
+        "634-RET",
+        "638-NORTE",
+        "647-650",
+        "702-NORTE",
+        "730-732"
+      ],
+      "acessos": [
+        "512-NORTE",
+        "515-NORTE",
+        "515-SUL",
+        "520-NORTE",
+        "521-NORTE"
+      ],
+      "licença": [
+        "AGUA",
+        "AMBIENTAL",
+        "TRANSPORTE"
+      ]
+    },
+    "01": {
+      "todos": [
+        "452-454",
+        "454-460",
+        "510-511",
+        "512-NORTE",
+        "515-NORTE",
+        "515-SUL",
+        "520-NORTE",
+        "521-NORTE",
+        "535-545",
+        "626-628",
+        "634-RET",
+        "638-NORTE",
+        "702-NORTE",
+        "730-732",
+        "AMBIENTAL"
+      ],
+      "principal": [
+        "452-454",
+        "454-460",
+        "510-511",
+        "535-545",
+        "626-628",
+        "634-RET",
+        "638-NORTE",
+        "702-NORTE",
+        "730-732"
+      ],
+      "acessos": [
+        "512-NORTE",
+        "515-NORTE",
+        "515-SUL",
+        "520-NORTE",
+        "521-NORTE"
+      ],
+      "licença": [
+        "AMBIENTAL"
+      ]
+    },
+    "02": {
+      "todos": [
+        "366-369",
+        "373-385",
+        "647-650",
+        "AMBIENTAL"
+      ],
+      "principal": [
+        "366-369",
+        "373-385",
+        "647-650"
+      ],
+      "licença": [
+        "AMBIENTAL"
+      ]
+    }
+  },
+  "disciplinas_por_ano_grupo": {
+    "todos": {
+      "todos": {
+        "todos": [
+          "AQ",
+          "AR",
+          "DR",
+          "DS",
+          "DV",
+          "EL",
+          "ES",
+          "GE",
+          "GG",
+          "HI",
+          "IN",
+          "MA",
+          "OC",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "452-454": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "454-460": [
+          "DR",
+          "DS",
+          "DV",
+          "EL",
+          "ES",
+          "GE",
+          "GG",
+          "IN",
+          "OC",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "510-511": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "512-NORTE": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "515-NORTE": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "515-SUL": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "520-NORTE": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "521-NORTE": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TO",
+          "TR"
+        ],
+        "535-545": [
+          "DR",
+          "DS",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "OC",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "626-628": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "634-RET": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "638-NORTE": [
+          "AQ",
+          "AR",
+          "DR",
+          "DS",
+          "DV",
+          "EL",
+          "ES",
+          "GE",
+          "GG",
+          "HI",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "702-NORTE": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "730-732": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "647-650": [
+          "DR",
+          "DS",
+          "DV",
+          "ES",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "366-369": [
+          "DR",
+          "DS",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "373-385": [
+          "DR",
+          "DS",
+          "DV",
+          "ES",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "AMBIENTAL": [
+          "MA"
+        ],
+        "AGUA": [
+          "MA"
+        ],
+        "TRANSPORTE": [
+          "MA"
+        ]
+      },
+      "principal": {
+        "todos": [
+          "AQ",
+          "AR",
+          "DR",
+          "DS",
+          "DV",
+          "EL",
+          "ES",
+          "GE",
+          "GG",
+          "HI",
+          "IN",
+          "OC",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "452-454": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "454-460": [
+          "DR",
+          "DS",
+          "DV",
+          "EL",
+          "ES",
+          "GE",
+          "GG",
+          "IN",
+          "OC",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "510-511": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "535-545": [
+          "DR",
+          "DS",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "OC",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "626-628": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "634-RET": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "638-NORTE": [
+          "AQ",
+          "AR",
+          "DR",
+          "DS",
+          "DV",
+          "EL",
+          "ES",
+          "GE",
+          "GG",
+          "HI",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "702-NORTE": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "730-732": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "647-650": [
+          "DR",
+          "DS",
+          "DV",
+          "ES",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "366-369": [
+          "DR",
+          "DS",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "373-385": [
+          "DR",
+          "DS",
+          "DV",
+          "ES",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ]
+      },
+      "acessos": {
+        "todos": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "512-NORTE": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "515-NORTE": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "515-SUL": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "520-NORTE": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "521-NORTE": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TO",
+          "TR"
+        ]
+      },
+      "licença": {
+        "todos": [
+          "MA"
+        ],
+        "AMBIENTAL": [
+          "MA"
+        ],
+        "AGUA": [
+          "MA"
+        ],
+        "TRANSPORTE": [
+          "MA"
+        ]
+      }
+    },
+    "01": {
+      "todos": {
+        "todos": [
+          "AQ",
+          "AR",
+          "DR",
+          "DS",
+          "DV",
+          "EL",
+          "ES",
+          "GE",
+          "GG",
+          "HI",
+          "IN",
+          "MA",
+          "OC",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "452-454": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "454-460": [
+          "DR",
+          "DS",
+          "DV",
+          "EL",
+          "ES",
+          "GE",
+          "GG",
+          "IN",
+          "OC",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "510-511": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "512-NORTE": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "515-NORTE": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "515-SUL": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "520-NORTE": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "521-NORTE": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TO",
+          "TR"
+        ],
+        "535-545": [
+          "DR",
+          "DS",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "OC",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "626-628": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "634-RET": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "638-NORTE": [
+          "AQ",
+          "AR",
+          "DR",
+          "DS",
+          "DV",
+          "EL",
+          "ES",
+          "GE",
+          "GG",
+          "HI",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "702-NORTE": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "730-732": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "AMBIENTAL": [
+          "MA"
+        ]
+      },
+      "principal": {
+        "todos": [
+          "AQ",
+          "AR",
+          "DR",
+          "DS",
+          "DV",
+          "EL",
+          "ES",
+          "GE",
+          "GG",
+          "HI",
+          "IN",
+          "OC",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "452-454": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "454-460": [
+          "DR",
+          "DS",
+          "DV",
+          "EL",
+          "ES",
+          "GE",
+          "GG",
+          "IN",
+          "OC",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "510-511": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "535-545": [
+          "DR",
+          "DS",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "OC",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "626-628": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "634-RET": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "638-NORTE": [
+          "AQ",
+          "AR",
+          "DR",
+          "DS",
+          "DV",
+          "EL",
+          "ES",
+          "GE",
+          "GG",
+          "HI",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "702-NORTE": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "730-732": [
+          "DR",
+          "DV",
+          "EL",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ]
+      },
+      "acessos": {
+        "todos": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "512-NORTE": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "515-NORTE": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "515-SUL": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "520-NORTE": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "521-NORTE": [
+          "DR",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TO",
+          "TR"
+        ]
+      },
+      "licença": {
+        "todos": [
+          "MA"
+        ],
+        "AMBIENTAL": [
+          "MA"
+        ]
+      }
+    },
+    "02": {
+      "todos": {
+        "todos": [
+          "DR",
+          "DS",
+          "DV",
+          "ES",
+          "GE",
+          "GG",
+          "IN",
+          "MA",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "647-650": [
+          "DR",
+          "DS",
+          "DV",
+          "ES",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "366-369": [
+          "DR",
+          "DS",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "373-385": [
+          "DR",
+          "DS",
+          "DV",
+          "ES",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "AMBIENTAL": [
+          "MA"
+        ]
+      },
+      "principal": {
+        "todos": [
+          "DR",
+          "DS",
+          "DV",
+          "ES",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "647-650": [
+          "DR",
+          "DS",
+          "DV",
+          "ES",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "366-369": [
+          "DR",
+          "DS",
+          "DV",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ],
+        "373-385": [
+          "DR",
+          "DS",
+          "DV",
+          "ES",
+          "GE",
+          "GG",
+          "IN",
+          "PA",
+          "PV",
+          "SI",
+          "TE",
+          "TO",
+          "TR"
+        ]
+      },
+      "licença": {
+        "todos": [
+          "MA"
+        ],
+        "AMBIENTAL": [
+          "MA"
+        ]
+      }
     }
   }
 }

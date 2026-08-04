@@ -9,7 +9,7 @@ Colunas esperadas no Excel (nomes podem ser ajustados nas constantes abaixo):
   codigo        | código do documento (ex: DR-452-001)
   titulo        | título completo do documento
   disciplina    | DRENAGEM | TERRAPLENAGEM | PAVIMENTO | TOPOGRAFIA | GEOMÉTRICO
-  trecho        | ex: km 452+454
+  obra        | ex: km 452+454
   revisao       | letra de revisão (ex: A, B, C)
   palavras_chave| termos separados por espaço ou vírgula
   link          | URL do OneDrive (gerado pelo "Copiar link" do OneDrive)
@@ -46,7 +46,8 @@ COL_MAP = {
     "disciplina":    "DISCIPLINA",
     "sigla":         "SIGLA",
     "ano":           "ANO",
-    "trecho":        "TRECHO",
+    "grupo":         "GRUPO",
+    "obra":        "OBRA",
     "revisao":       "REVISÃO",
     "palavras_chave":"PALAVRAS-CHAVE",
     "link":          "LINK",
@@ -107,43 +108,103 @@ def mapear_colunas(cabecalho, col_map):
 
 def gerar_filtros(documentos: list, json_path: str):
     """
-    Gera filtros.json com anos, trechos e disciplinas pré-computadas por
-    combinação ano×trecho — evita que o JavaScript precise calcular isso.
+    Gera filtros.json com anos, obras e disciplinas pré-computadas por
+    combinação ano×obra — evita que o JavaScript precise calcular isso.
     """
     from collections import defaultdict
 
     anos = sorted(set(d.get("ano", "") for d in documentos if d.get("ano")))
-
-    # trechos por ano
-    t_por_a: dict = defaultdict(set)
+    grupos_set = set(d.get("grupo", "principal") or "principal" for d in documentos)
+    grupos_outros = sorted(g for g in grupos_set if g != "principal")
+    grupos = (["principal"] if "principal" in grupos_set else []) + grupos_outros
+    
+    # obras por ano
+    o_por_a: dict = defaultdict(set)
     for d in documentos:
-        a, t = d.get("ano", ""), d.get("trecho", "")
-        if t:
-            t_por_a["todos"].add(t)
+        a, o = d.get("ano", ""), d.get("obra", "")
+        if o:
+            o_por_a["todos"].add(o)
             if a:
-                t_por_a[a].add(t)
-    trechos = {k: sorted(v) for k, v in t_por_a.items()}
+                o_por_a[a].add(o)
+    obras = {k: sorted(v) for k, v in o_por_a.items()}
 
-    # disciplinas por ano × trecho
+    # disciplinas por ano × obra
     disc: dict = defaultdict(lambda: defaultdict(set))
     for d in documentos:
-        a, t, s = d.get("ano", ""), d.get("trecho", ""), d.get("sigla", "")
+        a, o, s = d.get("ano", ""), d.get("obra", ""), d.get("sigla", "")
         if not s:
             continue
         disc["todos"]["todos"].add(s)
-        if t:
-            disc["todos"][t].add(s)
+        if o:
+            disc["todos"][o].add(s)
         if a:
             disc[a]["todos"].add(s)
-            if t:
-                disc[a][t].add(s)
+            if o:
+                disc[a][o].add(s)
 
     disciplinas = {
-        ano: {trecho: sorted(siglas) for trecho, siglas in td.items()}
+        ano: {obra: sorted(siglas) for obra, siglas in td.items()}
         for ano, td in disc.items()
     }
 
-    filtros = {"anos": anos, "trechos": trechos, "disciplinas": disciplinas}
+    # obras por ano × grupo
+    obras_por_ano_grupo: dict = defaultdict(lambda: defaultdict(set))
+    for d in documentos:
+        a = d.get("ano", "")
+        g = d.get("grupo", "principal") or "principal"
+        o = d.get("obra", "")
+        if not o:
+            continue
+        obras_por_ano_grupo["todos"]["todos"].add(o)
+        obras_por_ano_grupo["todos"][g].add(o)
+        if a:
+            obras_por_ano_grupo[a]["todos"].add(o)
+            obras_por_ano_grupo[a][g].add(o)
+
+    obras_ag = {
+        ano: {grupo: sorted(lista) for grupo, lista in grupos_dict.items()}
+        for ano, grupos_dict in obras_por_ano_grupo.items()
+    }
+
+    # disciplinas por ano × grupo × obra
+    disc_por_ano_grupo: dict = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
+    for d in documentos:
+        a = d.get("ano", "")
+        g = d.get("grupo", "principal") or "principal"
+        o = d.get("obra", "")
+        s = d.get("sigla", "")
+        if not s:
+            continue
+
+        disc_por_ano_grupo["todos"]["todos"]["todos"].add(s)
+        disc_por_ano_grupo["todos"][g]["todos"].add(s)
+        if o:
+            disc_por_ano_grupo["todos"]["todos"][o].add(s)
+            disc_por_ano_grupo["todos"][g][o].add(s)
+
+        if a:
+            disc_por_ano_grupo[a]["todos"]["todos"].add(s)
+            disc_por_ano_grupo[a][g]["todos"].add(s)
+            if o:
+                disc_por_ano_grupo[a]["todos"][o].add(s)
+                disc_por_ano_grupo[a][g][o].add(s)
+
+    disciplinas_ag = {
+        ano: {
+            grupo: {obra: sorted(siglas) for obra, siglas in obras_dict.items()}
+            for grupo, obras_dict in grupos_dict.items()
+        }
+        for ano, grupos_dict in disc_por_ano_grupo.items()
+    }
+
+    filtros = {
+        "anos": anos,
+        "grupos": grupos,
+        "obras": obras,
+        "disciplinas": disciplinas,
+        "obras_por_ano_grupo": obras_ag,
+        "disciplinas_por_ano_grupo": disciplinas_ag,
+    }
     filtros_path = Path(json_path).parent / "filtros.json"
     filtros_path.write_text(
         json.dumps(filtros, ensure_ascii=False, indent=2),
@@ -177,7 +238,8 @@ def converter(excel_path: str, json_path: str):
             "titulo":        normalizar(row[indices["titulo"]])        if "titulo"        in indices else "",
             "disciplina":    disc_upper                                if disc_upper in DISCIPLINAS_VALIDAS else disc_upper,
             "ano":           normalizar(row[indices["ano"]])           if "ano"           in indices else "",
-            "trecho":        normalizar(row[indices["trecho"]])        if "trecho"        in indices else "",
+            "grupo":         (normalizar(row[indices["grupo"]]).lower() if "grupo" in indices else "") or "principal",
+            "obra":          normalizar(row[indices["obra"]])          if "obra"        in indices else "",
             "revisao":       normalizar(row[indices["revisao"]])       if "revisao"       in indices else "",
             "palavras_chave":normalizar(row[indices["palavras_chave"]]) if "palavras_chave" in indices else "",
             "link":          normalizar(row[indices["link"]])          if "link"          in indices else "",

@@ -200,8 +200,8 @@
   .filter-btn[data-disc="TO"].active { background: var(--disc-TO); border-color: var(--disc-TO); color: #fff; }
   .filter-btn[data-disc="TR"].active { background: var(--disc-TR); border-color: var(--disc-TR); color: #000; }
 
-  .trecho-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
-  .trecho-row::-webkit-scrollbar { display: none; }
+  .obra-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  .obra-row::-webkit-scrollbar { display: none; }
 
   .disc-accordion {
     border: 1px solid var(--border);
@@ -286,7 +286,7 @@
   .td-code  { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); white-space: nowrap; }
   .td-titulo { color: var(--text); max-width: 320px; }
   .td-titulo mark { background: rgba(30,58,138,0.15); color: var(--accent); border-radius: 2px; padding: 0 1px; }
-  .td-trecho { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+  .td-obra { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
   .td-rev    { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text); text-align: center; }
   .td-link   { text-align: center; white-space: nowrap; }
 
@@ -494,16 +494,22 @@
       <input type="search" id="search" placeholder="Buscar por código, título ou palavra-chave…"
              autocomplete="off" autocorrect="off" spellcheck="false">
     </div>
-
+    
     <!-- Anos -->
     <span class="filter-label">Ano</span>
     <div class="btn-row" id="ano-btns">
       <button class="filter-btn active" data-ano="todos">Todos</button>
     </div>
 
-    <!-- Trechos — seleção múltipla, dependente do Ano -->
-    <span class="filter-label">Trechos</span>
-    <div class="trecho-row" id="trecho-btns"></div>
+    <!-- Grupo -->
+    <span class="filter-label">Grupo</span>
+    <div class="btn-row" id="grupo-btns">
+      <button class="filter-btn active" data-grupo="principal">Principal</button>
+    </div>
+
+    <!-- Obras — seleção múltipla, dependente do Ano -->
+    <span class="filter-label">Obras</span>
+    <div class="obra-row" id="obra-btns"></div>
 
     <!-- Disciplinas (recolhível) -->
     <span class="filter-label">Disciplinas</span>
@@ -534,7 +540,7 @@
         <th>Código</th>
         <th>Título</th>
         <th>Disciplina</th>
-        <th>Trecho</th>
+        <th>Obra</th>
         <th>Rev.</th>
         <th>Abrir</th>
       </tr>
@@ -609,8 +615,22 @@ let filteredDocs = [];
 let lastTerms    = [];
 let activeDisc   = 'TODAS';
 let activeAno    = 'todos';
-let activeTrechos = new Set(); // seleção múltipla
+let activeGrupo  = 'principal';
+let activeObras = new Set(); // seleção múltipla
 let filtros      = null;       // dados pré-computados de filtros.json
+
+function docGrupoValue(doc) {
+  return (doc?.grupo || 'principal').toString().trim().toLowerCase() || 'principal';
+}
+
+function formatGrupoLabel(grupo) {
+  if (!grupo) return '';
+  return grupo
+    .split(' ')
+    .filter(Boolean)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
 
 // ══════════════════════════════════════════════════════════════════════════
 // CONFIGURAÇÃO DO SERVIDOR LOCAL
@@ -799,7 +819,8 @@ async function loadDocumentos() {
   }
 
   buildAnoButtons();
-  buildTrechoButtons();
+  buildGrupoButtons();
+  buildObraButtons();
   buildDiscButtons();
   applyFilters();
   showToast(`${allDocs.length} docs — ${origem}`);
@@ -824,32 +845,70 @@ function buildAnoButtons() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// BOTÕES DE TRECHO (dependem do Ano selecionado)
+// BOTÕES DE GRUPO
 // ══════════════════════════════════════════════════════════════════════════
-function buildTrechoButtons() {
-  const trechos = filtros
-    ? (filtros.trechos[activeAno] || filtros.trechos['todos'] || [])
-    : [...new Set(allDocs
-        .filter(d => activeAno === 'todos' || d.ano === activeAno)
-        .map(d => d.trecho))].sort();
+function buildGrupoButtons() {
+  const gruposBase = filtros && Array.isArray(filtros.grupos) && filtros.grupos.length
+    ? filtros.grupos
+    : [...new Set(allDocs.map(docGrupoValue))];
 
-  // Remove trechos ativos que não existem mais no ano selecionado
-  activeTrechos = new Set([...activeTrechos].filter(t => trechos.includes(t)));
+  const grupos = [
+    ...new Set([
+      ...gruposBase.filter(g => g === 'principal'),
+      ...gruposBase.filter(g => g !== 'principal').sort((a, b) => a.localeCompare(b, 'pt-BR')),
+    ]),
+  ];
 
-  const wrap = document.getElementById('trecho-btns');
+  const wrap = document.getElementById('grupo-btns');
   wrap.innerHTML = '';
-  trechos.forEach(t => {
+
+  if (!grupos.includes(activeGrupo)) {
+    activeGrupo = grupos.includes('principal') ? 'principal' : (grupos[0] || 'principal');
+  }
+
+  grupos.forEach(grupo => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.dataset.grupo = grupo;
+    btn.textContent = formatGrupoLabel(grupo);
+    if (grupo === activeGrupo) btn.classList.add('active');
+    wrap.appendChild(btn);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// BOTÕES DE OBRA (dependem do Ano selecionado)
+// ══════════════════════════════════════════════════════════════════════════
+function buildObraButtons() {
+  let obras;
+
+  if (filtros?.obras_por_ano_grupo) {
+    const porAno = filtros.obras_por_ano_grupo[activeAno] || filtros.obras_por_ano_grupo['todos'] || {};
+    obras = porAno[activeGrupo] || porAno['todos'] || [];
+  } else {
+    obras = [...new Set(allDocs
+      .filter(d => activeAno === 'todos' || d.ano === activeAno)
+      .filter(d => docGrupoValue(d) === activeGrupo)
+      .map(d => d.obra)
+      .filter(Boolean))].sort();
+  }
+
+  activeObras = new Set([...activeObras].filter(t => obras.includes(t)));
+
+  const wrap = document.getElementById('obra-btns');
+  wrap.innerHTML = '';
+  obras.forEach(t => {
     const btn = document.createElement('button');
     btn.className      = 'filter-btn';
-    btn.dataset.trecho = t;
+    btn.dataset.obra = t;
     btn.textContent    = t;
-    if (activeTrechos.has(t)) btn.classList.add('active');
+    if (activeObras.has(t)) btn.classList.add('active');
     btn.addEventListener('click', () => {
-      if (activeTrechos.has(t)) {
-        activeTrechos.delete(t);
+      if (activeObras.has(t)) {
+        activeObras.delete(t);
         btn.classList.remove('active');
       } else {
-        activeTrechos.add(t);
+        activeObras.add(t);
         btn.classList.add('active');
       }
       buildDiscButtons();
@@ -860,24 +919,26 @@ function buildTrechoButtons() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// BOTÕES DE DISCIPLINA (dependem do Ano e Trechos selecionados)
+// BOTÕES DE DISCIPLINA (dependem do Ano e Obras selecionados)
 // ══════════════════════════════════════════════════════════════════════════
 function buildDiscButtons() {
   let presentDiscs;
 
-  if (filtros) {
-    const anoDiscs = filtros.disciplinas[activeAno] || filtros.disciplinas['todos'] || {};
-    if (activeTrechos.size === 0) {
-      presentDiscs = new Set(anoDiscs['todos'] || []);
+  if (filtros?.disciplinas_por_ano_grupo) {
+    const anoDiscs = filtros.disciplinas_por_ano_grupo[activeAno] || filtros.disciplinas_por_ano_grupo['todos'] || {};
+    const grupoDiscs = anoDiscs[activeGrupo] || anoDiscs['todos'] || {};
+    if (activeObras.size === 0) {
+      presentDiscs = new Set(grupoDiscs['todos'] || []);
     } else {
       presentDiscs = new Set();
-      activeTrechos.forEach(t => (anoDiscs[t] || []).forEach(s => presentDiscs.add(s)));
+      activeObras.forEach(t => (grupoDiscs[t] || []).forEach(s => presentDiscs.add(s)));
     }
   } else {
     presentDiscs = new Set(
       allDocs
         .filter(d => activeAno === 'todos' || d.ano === activeAno)
-        .filter(d => activeTrechos.size === 0 || activeTrechos.has(d.trecho))
+        .filter(d => docGrupoValue(d) === activeGrupo)
+        .filter(d => activeObras.size === 0 || activeObras.has(d.obra))
         .map(d => d.sigla)
     );
   }
@@ -933,10 +994,11 @@ function applyFilters() {
 
   filteredDocs = allDocs.filter(doc => {
     if (activeAno !== 'todos' && doc.ano !== activeAno) return false;
+    if (docGrupoValue(doc) !== activeGrupo) return false;
     if (activeDisc !== 'TODAS' && doc.sigla !== activeDisc) return false;
-    if (activeTrechos.size > 0 && !activeTrechos.has(doc.trecho)) return false;
+    if (activeObras.size > 0 && !activeObras.has(doc.obra)) return false;
     if (!terms.length) return true;
-    const hay = normalize([doc.codigo, doc.titulo, doc.palavras_chave, doc.disciplina, doc.trecho].join(' '));
+    const hay = normalize([doc.codigo, doc.titulo, doc.palavras_chave, doc.disciplina, doc.obra, doc.grupo].join(' '));
     return terms.every(t => hay.includes(t));
   });
 
@@ -981,7 +1043,7 @@ function renderTable(terms = []) {
         <td class="td-code">${highlight(doc.codigo, terms)}</td>
         <td class="td-titulo">${highlight(doc.titulo, terms)}</td>
         <td><span class="badge-disc badge-${escHtml(doc.sigla)}" title="${escHtml(DISC_MAP[doc.sigla] || doc.disciplina)}">${escHtml(doc.sigla)}</span></td>
-        <td class="td-trecho">${escHtml(doc.trecho)}</td>
+        <td class="td-obra">${escHtml(doc.obra)}</td>
         <td class="td-rev">${escHtml(doc.revisao)}</td>
         <td class="td-link">${btnHtml}</td>
       </tr>`;
@@ -999,10 +1061,24 @@ document.getElementById('ano-btns').addEventListener('click', e => {
   activeAno = btn.dataset.ano;
   document.querySelectorAll('#ano-btns .filter-btn')
     .forEach(b => b.classList.toggle('active', b.dataset.ano === activeAno));
-  activeTrechos = new Set();  // reset trechos ao mudar de ano
+  activeObras = new Set();  // reset obras ao mudar de ano
   activeDisc    = 'TODAS';   // reset disciplina ao mudar de ano
   document.querySelector('#disc-btns .filter-btn[data-disc="TODAS"]').classList.add('active');
-  buildTrechoButtons();
+  buildObraButtons();
+  buildDiscButtons();
+  applyFilters();
+});
+
+document.getElementById('grupo-btns').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  activeGrupo = btn.dataset.grupo;
+  document.querySelectorAll('#grupo-btns .filter-btn')
+    .forEach(b => b.classList.toggle('active', b.dataset.grupo === activeGrupo));
+  activeObras = new Set();
+  activeDisc = 'TODAS';
+  document.querySelector('#disc-btns .filter-btn[data-disc="TODAS"]').classList.add('active');
+  buildObraButtons();
   buildDiscButtons();
   applyFilters();
 });
@@ -1024,13 +1100,16 @@ document.getElementById('disc-btns').addEventListener('click', e => {
 document.getElementById('clear-btn').addEventListener('click', () => {
   document.getElementById('search').value = '';
   activeAno     = 'todos';
+  activeGrupo   = 'principal';
   activeDisc    = 'TODAS';
-  activeTrechos = new Set();
+  activeObras = new Set();
   document.querySelectorAll('#ano-btns .filter-btn')
     .forEach(b => b.classList.toggle('active', b.dataset.ano === 'todos'));
+  document.querySelectorAll('#grupo-btns .filter-btn')
+    .forEach(b => b.classList.toggle('active', b.dataset.grupo === 'principal'));
   document.querySelectorAll('#disc-btns .filter-btn')
     .forEach(b => b.classList.toggle('active', b.dataset.disc === 'TODAS'));
-  buildTrechoButtons();
+  buildObraButtons();
   buildDiscButtons();
   applyFilters();
 });
