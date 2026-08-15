@@ -6,6 +6,7 @@
   "grupos": [
     "principal",
     "acessos",
+    "caderno",
     "licença"
   ],
   "obras": {
@@ -29,6 +30,8 @@
       "730-732",
       "AGUA",
       "AMBIENTAL",
+      "DER-SP",
+      "DNIT",
       "TRANSPORTE"
     ],
     "01": [
@@ -329,6 +332,12 @@
       ],
       "TRANSPORTE": [
         "MA"
+      ],
+      "DNIT": [
+        "DR"
+      ],
+      "DER-SP": [
+        "DR"
       ]
     },
     "01": {
@@ -644,6 +653,8 @@
         "730-732",
         "AGUA",
         "AMBIENTAL",
+        "DER-SP",
+        "DNIT",
         "TRANSPORTE"
       ],
       "principal": [
@@ -671,6 +682,10 @@
         "AGUA",
         "AMBIENTAL",
         "TRANSPORTE"
+      ],
+      "caderno": [
+        "DER-SP",
+        "DNIT"
       ]
     },
     "01": {
@@ -1005,6 +1020,12 @@
         ],
         "TRANSPORTE": [
           "MA"
+        ],
+        "DNIT": [
+          "DR"
+        ],
+        "DER-SP": [
+          "DR"
         ]
       },
       "principal": {
@@ -1299,6 +1320,17 @@
         ],
         "TRANSPORTE": [
           "MA"
+        ]
+      },
+      "caderno": {
+        "todos": [
+          "DR"
+        ],
+        "DNIT": [
+          "DR"
+        ],
+        "DER-SP": [
+          "DR"
         ]
       }
     },
